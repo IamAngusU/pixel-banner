@@ -6,7 +6,6 @@
 
 <p align="center">
   <a href="README.de.md"><img src="docs/assets/readme-language-de.svg" height="40" alt="Diese README auf Deutsch lesen"></a>
-  <a href="https://github.com/IamAngusU/pixel-banner/actions/workflows/ci.yml"><img src="https://github.com/IamAngusU/pixel-banner/actions/workflows/ci.yml/badge.svg" alt="CI status"></a>
 </p>
 
 <p align="center"><a href="https://iamangusu.github.io/pixel-banner/">Open the web app</a> · <a href="#quick-start">Quick start</a></p>
