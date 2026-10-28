@@ -60,6 +60,16 @@ test('animations add the expected elements', () => {
   assert.ok(!renderSvg('A').includes('<animate'));
 });
 
+test('gradient faces use shared banner coordinates so shimmer spans the text', () => {
+  const svg = renderSvg('AB', { animation: 'shimmer', depth: 0, highlight: 0 });
+  const facePaths = [...svg.matchAll(/<path d="([^"]+)" fill="url\(#f\)"\/>/g)].map((match) => match[1]);
+  assert.equal(facePaths.length, 2);
+  const firstX = (path) => Number(path.match(/M([\d.-]+)/)[1]);
+  assert.ok(firstX(facePaths[1]) > firstX(facePaths[0]), 'each glyph face is positioned in banner coordinates');
+  assert.match(svg, /<linearGradient id="f" gradientUnits="userSpaceOnUse" x1="1" y1="0" x2="\d+" y2="0"/);
+  assert.match(svg, /<animateTransform attributeName="gradientTransform"/);
+});
+
 test('every preset renders', () => {
   for (const preset of Object.keys(PRESETS)) assert.ok(renderSvg('TEST', { preset }));
 });

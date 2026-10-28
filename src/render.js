@@ -43,14 +43,17 @@ const face = (g, x, y) => g[y]?.[x] === 1;
 const edge = (g, x, y) => face(g, x, y) && !face(g, x, y - 1); // pixels with nothing above them
 
 // Path built from horizontal runs: much smaller than one <rect> per pixel.
-function runs(g, ox, keep) {
+const fmt = (value) => Number(value.toFixed(4)).toString();
+
+function runs(g, ox, keep, sx = 1, oy = 0) {
   let d = '';
   g.forEach((row, y) => {
     for (let x = 0; x < row.length; x++) {
       if (!keep(g, x, y)) continue;
       const s = x;
       while (keep(g, x + 1, y)) x++;
-      d += `M${ox + s} ${y}h${x - s + 1}v1h${s - x - 1}z`;
+      const width = (x - s + 1) * sx;
+      d += `M${fmt(ox + s * sx)} ${fmt(oy + y)}h${fmt(width)}v1h${fmt(-width)}z`;
     }
   });
   return d;
@@ -71,14 +74,18 @@ export function renderSvg(text, opts = {}) {
   const glyphScale = (i) => widthScale * (1 - taperAmount * (i / Math.max(1, n - 1)));
   const glyphWidths = grids.map((g, i) => g[0].length * glyphScale(i));
   const wave = o.animation === 'wave' ? 1 : 0;
+  const glyphY = o.padding + wave;
   const floor = o.animation === 'floor';
   const floorH = floor ? 6 : 0;   // gradient floor band below the text
   const footerH = o.footer ? (2 * (GLYPH_H + 1) + 3) : 0;  // two text lines + gap
   const W = 2 * o.padding + glyphWidths.reduce((sum, width) => sum + width, 0) + (n - 1) * o.spacing + o.depth;
   const H = 2 * (o.padding + wave) + gh + o.depth + floorH;
   const Htotal = H + footerH;
-  const len = o.vertical ? gh + o.depth : W - o.padding;
-  const [x2, y2] = o.vertical ? [0, len] : [len, 0];
+  const textWidth = glyphWidths.reduce((sum, width) => sum + width, 0) + (n - 1) * o.spacing;
+  const len = o.vertical ? gh : textWidth;
+  const [x1, y1, x2, y2] = o.vertical
+    ? [0, glyphY, 0, glyphY + len]
+    : [o.padding, 0, o.padding + len, 0];
   const colors = o.colors.length > 1 ? o.colors : [o.colors[0], o.colors[0]];
 
   const stops = colors.map((c, i) => `<stop offset="${(i / (colors.length - 1)).toFixed(3)}" stop-color="${c}"/>`).join('');
@@ -100,17 +107,20 @@ export function renderSvg(text, opts = {}) {
   const reveal = o.animation === 'reveal';
   const letters = grids.map((g, i) => {
     const sx = glyphScale(i);
-    let s = '';
+    let shadow = '';
     for (let k = o.depth; k >= 1; k--) {
       // Compensate the x offset so glyph compression does not flatten the 3D depth.
-      s += `<use href="#g${i}" x="${(k / sx).toFixed(3)}" y="${k}" fill="${mix(shadowInk, light ? '#ffffff' : '#000000', ((k - 1) / (o.depth || 1)) * 0.5)}"/>`;
+      shadow += `<use href="#g${i}" x="${(k / sx).toFixed(3)}" y="${k}" fill="${mix(shadowInk, light ? '#ffffff' : '#000000', ((k - 1) / (o.depth || 1)) * 0.5)}"/>`;
     }
-    s += `<use href="#g${i}" fill="url(#f)"/>`;
-    if (light) s += `<path d="${runs(g, 0, face)}" fill="none" stroke="${mix(o.colors[0], '#000000', 0.5)}" stroke-width="0.5" stroke-opacity="0.35"/>`;
-    if (o.highlight > 0) s += `<path d="${runs(g, 0, edge)}" fill="${shine}" fill-opacity="${shineOpacity}"/>`;
-    if (wave) s += `<animateTransform attributeName="transform" type="translate" values="0 0;0 -1;0 0" dur="1.2s" begin="${(i * 0.12).toFixed(2)}s" repeatCount="indefinite"/>`;
+    const shadowLayer = `<g transform="translate(${ox(i)} ${glyphY}) scale(${sx.toFixed(4)} 1)">${shadow}</g>`;
+    const facePath = `<path d="${runs(g, ox(i), face, sx, glyphY)}" fill="url(#f)"/>`;
+    let details = '';
+    if (light) details += `<path d="${runs(g, 0, face)}" fill="none" stroke="${mix(o.colors[0], '#000000', 0.5)}" stroke-width="0.5" stroke-opacity="0.35"/>`;
+    if (o.highlight > 0) details += `<path d="${runs(g, 0, edge)}" fill="${shine}" fill-opacity="${shineOpacity}"/>`;
+    const detailLayer = details ? `<g transform="translate(${ox(i)} ${glyphY}) scale(${sx.toFixed(4)} 1)">${details}</g>` : '';
+    const waveFx = wave ? `<animateTransform attributeName="transform" type="translate" values="0 0;0 -1;0 0" dur="1.2s" begin="${(i * 0.12).toFixed(2)}s" repeatCount="indefinite"/>` : '';
     const revealBase = reveal ? ' opacity="0" transform="translate(0 3)" filter="url(#blur)"' : '';
-    return `<g transform="translate(${ox(i)} 0) scale(${sx.toFixed(4)} 1)"><g${revealBase}>${s}${reveal ? revealFx(i) : ''}</g></g>`;
+    return `<g${revealBase}>${shadowLayer}${facePath}${detailLayer}${waveFx}${reveal ? revealFx(i) : ''}</g>`;
   }).join('');
 
   const blink = o.animation === 'blink' ? '<animate attributeName="opacity" values="1;.35;1" dur="1.6s" repeatCount="indefinite"/>' : '';
@@ -123,8 +133,8 @@ export function renderSvg(text, opts = {}) {
 
   // aria-label + responsive: width/height only hint the intrinsic size, CSS max-width keeps it fluid
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${Htotal}" width="${W * o.scale}" height="${Htotal * o.scale}" preserveAspectRatio="xMidYMid meet" shape-rendering="crispEdges" role="img" aria-label="${esc(String(text))}">`
-    + `<title>${esc(String(text))}</title><defs>${defs}${reveal ? blurFilter() : ''}<linearGradient id="f" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="${x2}" y2="${y2}" spreadMethod="reflect">${stops}${shimmer}</linearGradient></defs>`
-    + `${bg}<g transform="translate(0 ${o.padding + wave})">${blink}${letters}</g>`
+    + `<title>${esc(String(text))}</title><defs>${defs}${reveal ? blurFilter() : ''}<linearGradient id="f" gradientUnits="userSpaceOnUse" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" spreadMethod="reflect">${stops}${shimmer}</linearGradient></defs>`
+    + `${bg}<g>${blink}${letters}</g>`
     + `${floorBand}${footer}</svg>`;
 }
 

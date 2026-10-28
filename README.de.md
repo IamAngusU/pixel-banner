@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/pixel-banner.svg" alt="PIXEL-BANNER" width="520">
+  <img src="assets/banner.svg" alt="PIXEL-BANNER" width="520">
 </p>
 
 <p align="center"><strong>Pixel-Art-Textbanner als bearbeitbare SVGs.</strong><br>Stil wählen, Farben und Effekte anpassen und das Banner in einer README oder auf einer Website nutzen.</p>
