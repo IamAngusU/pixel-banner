@@ -5,6 +5,7 @@ import { renderSvg } from '../src/index.js';
 const out = (f, text, opts) => writeFileSync(new URL('../' + f, import.meta.url), renderSvg(text, opts) + '\n');
 
 out('assets/banner.svg', 'PIXEL-BANNER', { preset: 'neon', scale: 6 });
+out('assets/pixel-banner.svg', 'PIXEL-BANNER', { preset: 'aiphone', animation: 'shimmer', scale: 8 });
 out('examples/hello.svg', 'HELLO', { preset: 'aiphone', scale: 5 });
 out('examples/neon.svg', 'NEON', { preset: 'neon', scale: 5 });
 out('examples/fire.svg', 'FIRE', { preset: 'fire', scale: 5 });
