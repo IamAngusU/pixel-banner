@@ -131,6 +131,7 @@ function draw(event) {
 
 function applyPreset(name) {
   const p = { ...DEFAULTS, ...PRESETS[name] };
+  $('preset').value = name;
   const [a, b, c] = p.colors;
   $('c1').value = a; $('c2').value = b || a; $('c3').value = c || b || a; $('use3').checked = p.colors.length > 2;
   $('shadow').value = p.shadow; $('scale').value = p.scale; $('scalePx').value = p.scale; $('glyphWidth').value = p.glyphWidth ?? DEFAULTS.glyphWidth; $('taper').checked = !!p.taper; $('depth').value = p.depth; $('spacing').value = p.spacing;
