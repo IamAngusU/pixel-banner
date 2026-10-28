@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>pixel-banner</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:dark;
+--page:#080b11;--win:#0d121b;--bar:#121a26;--field:#0a1019;--line:#253448;--ink:#e4edf8;--dim:#8094ad;--a:#69f0c8;--a2:#91a5ff;--ok:#69f0c8;--stage:#070b11;--checker:#172230;--checker-b:#0b111a;--grid:rgba(105,240,200,.055);--track:#263447;--shadow:0 24px 70px rgba(0,0,0,.34)}
+@media(prefers-color-scheme:light){:root:not([data-theme="dark"]){color-scheme:light;--page:#e6eaf0;--win:#f8fafc;--bar:#edf2f7;--field:#f9fbfd;--line:#c8d3e0;--ink:#142231;--dim:#61748b;--a:#087e68;--a2:#454bd6;--ok:#087e68;--stage:#fff;--checker:#e3eaf2;--checker-b:#fff;--grid:rgba(6,80,80,.07);--track:#d3dde8;--shadow:0 22px 56px rgba(31,48,71,.13)}}
+:root[data-theme="light"]{color-scheme:light;--page:#e6eaf0;--win:#f8fafc;--bar:#edf2f7;--field:#f9fbfd;--line:#c8d3e0;--ink:#142231;--dim:#61748b;--a:#087e68;--a2:#454bd6;--ok:#087e68;--stage:#fff;--checker:#e3eaf2;--checker-b:#fff;--grid:rgba(6,80,80,.07);--track:#d3dde8;--shadow:0 22px 56px rgba(31,48,71,.13)}
+*,*::before,*::after{box-sizing:inherit}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100vh;background-color:var(--page);background-image:radial-gradient(var(--grid) 1px,transparent 1px);background-size:20px 20px;color:var(--ink);font:13px/1.55 ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;letter-spacing:.01em}
+main{padding:clamp(12px,3vw,34px)}.win{max-width:880px;margin:0 auto;border:1px solid var(--line);border-radius:12px;background:var(--win);overflow:hidden;box-shadow:var(--shadow)}
+.bar{display:flex;align-items:center;gap:7px;padding:11px 16px;background:var(--bar);border-bottom:1px solid var(--line);min-height:44px}.bar i{width:9px;height:9px;border-radius:50%;flex:none}.bar-title{flex:1;text-align:center;color:var(--dim);font-size:11px;letter-spacing:.12em;margin-left:24px}.bar-right{color:var(--dim);font-size:10px;white-space:nowrap;letter-spacing:.08em}.status-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--a);box-shadow:0 0 10px color-mix(in srgb,var(--a) 65%,transparent);margin-right:6px}
+.body{padding:clamp(16px,3vw,28px)}.head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin:0 0 20px}.kicker{font-size:10px;color:var(--a);letter-spacing:.16em;margin:0 0 5px}.heading-line{display:flex;align-items:center;flex-wrap:wrap;gap:10px}.heading-line h1{font-size:24px;line-height:1.2;letter-spacing:-.06em;margin:0;font-weight:750}.version{border:1px solid var(--line);border-radius:4px;padding:1px 6px;color:var(--dim);font-size:10px}.head-sub{margin:7px 0 0;color:var(--dim);font-size:12px}.live{display:flex;align-items:center;gap:7px;white-space:nowrap;padding:6px 9px;border:1px solid color-mix(in srgb,var(--a) 35%,var(--line));border-radius:5px;color:var(--a);font-size:10px;letter-spacing:.08em;background:color-mix(in srgb,var(--a) 5%,transparent)}
+.preview-shell{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--stage);margin-bottom:22px}.preview-bar{display:flex;justify-content:space-between;gap:12px;padding:7px 11px;background:var(--bar);border-bottom:1px solid var(--line);font-size:10px;letter-spacing:.08em;color:var(--dim)}.preview-bar b{color:var(--a);font-weight:600;margin-right:8px}.stage{min-height:160px;display:flex;align-items:center;justify-content:center;background:var(--stage);padding:clamp(16px,4vw,30px);overflow-x:auto}.stage.on-light{background:#f7f7fb}.stage svg{display:block;max-width:100%;height:auto;width:100%}.stage.checker{background-color:var(--checker-b);background-image:linear-gradient(45deg,var(--checker) 25%,transparent 25%),linear-gradient(-45deg,var(--checker) 25%,transparent 25%),linear-gradient(45deg,transparent 75%,var(--checker) 75%),linear-gradient(-45deg,transparent 75%,var(--checker) 75%);background-size:16px 16px;background-position:0 0,0 8px,8px -8px,-8px 0}.stage.checker.on-light{--checker:#e2e2ee;--checker-b:#fff}.stage p{margin:0;color:var(--dim)}
+.control-section{padding:14px 0 16px;border-bottom:1px solid var(--line)}.section-head{display:flex;align-items:center;gap:10px;margin:0 0 10px}.section-num{font-size:10px;color:var(--a);letter-spacing:.12em}.section-title{font-size:11px;font-weight:700;letter-spacing:.13em}.section-note{margin-left:auto;color:var(--dim);font-size:9px;letter-spacing:.1em;text-align:right}.row{display:grid;grid-template-columns:12ch minmax(0,1fr);gap:0 1.5ch;align-items:center;padding:5px 0}.row>label,.row-label{color:var(--dim);font-size:11px}.ctl{display:flex;align-items:center;gap:9px;min-width:0;flex-wrap:wrap}.full-input{font:inherit;color:var(--ink);background:var(--field);border:1px solid var(--line);border-radius:5px;padding:7px 10px;min-width:0;width:100%;max-width:38ch;box-shadow:inset 0 1px 0 rgba(255,255,255,.025);transition:border-color .15s,box-shadow .15s}.full-input:hover,select:hover{border-color:color-mix(in srgb,var(--a) 50%,var(--line))}.full-input:focus,select:focus{border-color:var(--a);box-shadow:0 0 0 3px color-mix(in srgb,var(--a) 12%,transparent);outline:none}input[type=text]{text-transform:uppercase}select{appearance:none;-webkit-appearance:none;font:inherit;color:var(--ink);background-color:var(--field);border:1px solid var(--line);border-radius:5px;padding:7px 34px 7px 10px;min-width:0;width:100%;max-width:38ch;cursor:pointer;background-image:linear-gradient(45deg,transparent 50%,var(--a) 50%),linear-gradient(135deg,var(--a) 50%,transparent 50%);background-position:calc(100% - 15px) 50%,calc(100% - 10px) 50%;background-size:5px 5px,5px 5px;background-repeat:no-repeat}option{background:var(--win);color:var(--ink)}
+input[type=color]{appearance:none;width:34px;height:30px;padding:3px;border:1px solid var(--line);border-radius:5px;background:var(--field);cursor:pointer}input[type=color]::-webkit-color-swatch-wrapper{padding:2px}input[type=color]::-webkit-color-swatch{border:0;border-radius:3px}input[type=color]::-moz-color-swatch{border:0;border-radius:3px}
+input[type=range]{--range-progress:50%;appearance:none;-webkit-appearance:none;width:100%;max-width:31ch;height:22px;margin:0;background:transparent;cursor:pointer;touch-action:pan-y}input[type=range]::-webkit-slider-runnable-track{height:4px;border:0;border-radius:4px;background:linear-gradient(90deg,var(--a) 0 var(--range-progress),var(--track) var(--range-progress) 100%);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--line) 50%,transparent)}input[type=range]::-moz-range-track{height:4px;border:0;border-radius:4px;background:var(--track)}input[type=range]::-moz-range-progress{height:4px;border-radius:4px;background:var(--a)}input[type=range]::-webkit-slider-thumb{appearance:none;width:13px;height:13px;border:2px solid var(--a);border-radius:4px;background:var(--win);margin-top:-4.5px;box-shadow:0 0 0 3px color-mix(in srgb,var(--a) 12%,transparent)}input[type=range]::-moz-range-thumb{width:10px;height:10px;border:2px solid var(--a);border-radius:4px;background:var(--win);box-shadow:0 0 0 3px color-mix(in srgb,var(--a) 12%,transparent)}input[type=range]:focus-visible{outline:0}input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 4px color-mix(in srgb,var(--a) 24%,transparent)}
+.readout{display:flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:5px;background:var(--field);padding:3px 7px}.readout input{font:inherit;color:var(--a);background:transparent;border:0;outline:0;width:3.5ch;text-align:right;padding:0}.readout span{font-size:10px;color:var(--dim)}output{display:inline-block;color:var(--a);background:color-mix(in srgb,var(--a) 7%,var(--field));border:1px solid color-mix(in srgb,var(--a) 22%,var(--line));border-radius:4px;min-width:5.3ch;text-align:center;padding:2px 6px;font-size:10px;font-variant-numeric:tabular-nums}.chk{display:inline-flex;align-items:center;gap:7px;color:var(--ink);cursor:pointer;user-select:none}.chk input[type=checkbox]{appearance:none;-webkit-appearance:none;display:inline-grid;place-content:center;width:15px;height:15px;margin:0;border:1px solid var(--dim);border-radius:3px;background:var(--field);cursor:pointer;flex:none}.chk input[type=checkbox]::after{content:"";width:7px;height:4px;border:solid var(--win);border-width:0 0 2px 2px;transform:rotate(-45deg) scale(0);transform-origin:center;transition:transform .12s ease}.chk input[type=checkbox]:checked{background:var(--a);border-color:var(--a)}.chk input[type=checkbox]:checked::after{transform:rotate(-45deg) scale(1)}.chk:hover{color:var(--a)}.explain{color:var(--dim);font-size:10px}.disabled-note{opacity:.45}.menu{margin-top:18px;padding-top:12px;border-top:1px solid var(--line)}.menu-title{display:flex;align-items:center;gap:10px;color:var(--dim);font-size:10px;letter-spacing:.14em;margin:0 0 8px}.menu-title::after{content:"";height:1px;flex:1;background:var(--line)}.item{display:flex;align-items:center;flex-wrap:wrap;gap:0 1.5ch;width:100%;text-align:left;background:none;border:0;color:var(--ink);font:inherit;padding:6px 0;cursor:pointer}.item .mk{visibility:hidden;color:var(--a);width:1ch}.item .k,.item .d{color:var(--dim)}.item .t{min-width:17ch}.item:hover .mk,.item:focus-visible .mk{visibility:visible}.item:hover .t,.item:focus-visible .t{color:var(--a)}details summary{list-style:none;cursor:pointer;padding:6px 0}details summary::-webkit-details-marker{display:none}summary .k{color:var(--dim)}details[open] summary .mk{visibility:visible;transform:rotate(90deg)}.item .mk{display:inline-block;transition:transform .15s ease}textarea{display:block;width:100%;height:140px;margin-top:7px;font:12px/1.5 ui-monospace,monospace;color:var(--ink);background:var(--field);border:1px solid var(--line);border-radius:5px;padding:10px;resize:vertical}#msg{min-height:1.55em;margin:10px 0 0;color:var(--ok);font-size:11px}.hint{margin:7px 0 0;color:var(--dim);font-size:10px}.sr-label{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}:focus-visible{outline:2px solid var(--a);outline-offset:3px}input:disabled{opacity:.35;cursor:not-allowed}input[type=color]:disabled{filter:saturate(.35)}
+@media(max-width:560px){main{padding:8px}.win{border-radius:8px}.bar{padding:10px 12px}.bar-title{margin-left:2px;text-align:left}.bar-right{display:none}.head{gap:10px;flex-direction:column}.heading-line h1{font-size:22px}.live{align-self:flex-start}.preview-bar{font-size:9px}.stage{min-height:125px;padding:14px}.row{grid-template-columns:9ch minmax(0,1fr);gap:0 8px}.section-note{font-size:8px}.ctl{gap:7px}input[type=range]{max-width:100%;flex:1;min-width:85px}.readout{flex:none}.item .d{width:100%;padding-left:calc(2ch + 1.5ch)}.colorrow{row-gap:7px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;scroll-behavior:auto!important}}
+</style></head><body><main>
+<div class="win">
+ <div class="bar"><i style="background:#ff6159"></i><i style="background:#ffc44f"></i><i style="background:#42d982"></i><span class="bar-title">PIXEL-BANNER / SVG ENGINE</span><span class="bar-right"><span class="status-dot"></span>LOCAL SESSION</span></div>
+ <div class="body">
+  <header class="head"><div><p class="kicker">VECTOR TOOLKIT / 01</p><div class="heading-line"><h1>pixel-banner</h1><span class="version">v1.0</span></div><p class="head-sub">Pixel typography, built as editable SVG.</p></div><div class="live"><span class="status-dot"></span>LIVE RENDER</div></header>
+  <div class="preview-shell"><div class="preview-bar"><span><b>OUTPUT / 01</b> LIVE SVG</span><span id="stageInfo">WAITING FOR INPUT</span></div><div class="stage" id="stage" aria-live="polite"></div></div>
+
+  <section class="control-section">
+   <div class="section-head"><span class="section-num">01</span><span class="section-title">SOURCE</span><span class="section-note">CONTENT / PRESET</span></div>
+   <div class="row"><label for="text">Text</label><div class="ctl"><input class="full-input" type="text" id="text" maxlength="20" value="PIXEL-BANNER" autocomplete="off" spellcheck="false"></div></div>
+   <div class="row"><label for="preset">Preset</label><div class="ctl"><select id="preset"></select></div></div>
+  </section>
+
+  <section class="control-section">
+   <div class="section-head"><span class="section-num">02</span><span class="section-title">GEOMETRY</span><span class="section-note">SIZE / GLYPH / DEPTH</span></div>
+   <div class="row"><label for="scale">Output size</label><div class="ctl"><input type="range" id="scale" min="2" max="20" step="1" value="8"><div class="readout"><input type="number" id="scalePx" min="2" max="20" step="1" value="8" aria-label="Output size in pixels"><span>PX</span></div></div></div>
+   <div class="row"><label for="glyphWidth">Glyph width</label><div class="ctl"><input type="range" id="glyphWidth" min="60" max="140" step="5" value="100"><output id="o-glyphWidth">100%</output><span class="explain">narrow ↔ wide</span></div></div>
+   <div class="row"><span class="row-label">Per-letter</span><div class="ctl"><label class="chk" title="Each following glyph gets narrower; the last is up to 28% narrower"><input type="checkbox" id="taper"> Narrow progressively</label><span class="explain">up to −28% toward the end</span></div></div>
+   <div class="row"><label for="depth">3D depth</label><div class="ctl"><input type="range" id="depth" min="0" max="8" step="1" value="3"><output id="o-depth">3</output></div></div>
+   <div class="row"><label for="spacing">Letter gap</label><div class="ctl"><input type="range" id="spacing" min="0" max="5" step="1" value="1"><output id="o-spacing">1</output><span class="explain">pixel cells</span></div></div>
+   <div class="row"><label for="weight">Stroke weight</label><div class="ctl"><select id="weight"><option value="1">01 / Thin</option><option value="2">02 / Bold</option></select></div></div>
+  </section>
+
+  <section class="control-section">
+   <div class="section-head"><span class="section-num">03</span><span class="section-title">COLOR & LIGHT</span><span class="section-note">GRADIENT / MATERIAL</span></div>
+   <div class="row colorrow"><span class="row-label">Gradient stops</span><div class="ctl"><input type="color" id="c1" aria-label="First gradient color" title="First gradient color"><input type="color" id="c2" aria-label="Second gradient color" title="Second gradient color"><input type="color" id="c3" aria-label="Third gradient color" title="Third gradient color"><label class="chk" title="Add a third stop to the color gradient"><input type="checkbox" id="use3"> 3-stop gradient</label></div></div>
+   <div class="row"><label for="shadow">Shadow tint</label><div class="ctl"><input type="color" id="shadow" aria-label="Shadow tint"></div></div>
+   <div class="row"><label for="highlight">Top-edge shine</label><div class="ctl"><input type="range" id="highlight" min="0" max="60" step="1" value="25"><output id="o-highlight">25%</output></div></div>
+   <div class="row"><label for="dir">Gradient axis</label><div class="ctl"><select id="dir"><option value="h">Horizontal →</option><option value="v">Vertical ↓</option></select></div></div>
+   <div class="row"><span class="row-label">Page mode</span><div class="ctl"><label class="chk" title="Tune the banner for white or light backgrounds"><input type="checkbox" id="light"> Light-page contrast</label></div></div>
+   <div class="row"><span class="row-label">Background</span><div class="ctl"><label class="chk" title="Off means the exported SVG remains transparent"><input type="checkbox" id="useBg"> Solid fill</label><input type="color" id="bg" value="#000000" aria-label="Background color" title="Background color"></div></div>
+  </section>
+
+  <section class="control-section">
+   <div class="section-head"><span class="section-num">04</span><span class="section-title">MOTION & EDITOR</span><span class="section-note">ANIMATION / INTERFACE</span></div>
+   <div class="row"><label for="animation">Animation</label><div class="ctl"><select id="animation"><option value="none">00 / Static</option><option value="wave">01 / Wave</option><option value="shimmer">02 / Shimmer</option><option value="blink">03 / Blink</option><option value="floor">04 / Gradient floor</option><option value="reveal">05 / Letter reveal</option></select></div></div>
+   <div class="row"><label for="uiTheme">Editor theme</label><div class="ctl"><select id="uiTheme"><option value="auto">System default</option><option value="dark">Dark terminal</option><option value="light">Light terminal</option></select></div></div>
+  </section>
+
+  <nav class="menu">
+   <p class="menu-title">05 / EXPORT</p>
+   <button class="item" id="dl"><span class="mk">▸</span><span class="k">[1]</span><span class="t">Download SVG</span><span class="d" id="dlHint"></span></button>
+   <button class="item" id="cpMd"><span class="mk">▸</span><span class="k">[2]</span><span class="t">Copy Markdown</span><span class="d">image tag for your README</span></button>
+   <button class="item" id="cpSvg"><span class="mk">▸</span><span class="k">[3]</span><span class="t">Copy SVG code</span><span class="d">paste into any file</span></button>
+   <details><summary class="item"><span class="mk">▸</span><span class="k">[4]</span><span class="t">Show SVG source</span></summary><textarea id="code" readonly spellcheck="false" aria-label="Generated SVG code"></textarea></details>
+  </nav>
+  <p id="msg" role="status"></p>
+  <p class="hint">KEYS 1–3 · Local rendering only · Nothing is uploaded</p>
+ </div>
+</div>
+</main>
+<script>
+const PixelBanner = (() => {
+// 5x7 pixel font. Each row is 5 bits (MSB on the left), written in hex. Add new characters here.
+const GLYPH_W = 5;
+const GLYPH_H = 7;
+const raw = {
+  A: '0E 11 11 1F 11 11 11', B: '1E 11 11 1E 11 11 1E', C: '0E 11 10 10 10 11 0E',
+  D: '1E 11 11 11 11 11 1E', E: '1F 10 10 1E 10 10 1F', F: '1F 10 10 1E 10 10 10',
+  G: '0E 11 10 17 11 11 0F', H: '11 11 11 1F 11 11 11', I: '0E 04 04 04 04 04 0E',
+  J: '07 02 02 02 02 12 0C', K: '11 12 14 18 14 12 11', L: '10 10 10 10 10 10 1F',
+  M: '11 1B 15 15 11 11 11', N: '11 19 15 13 11 11 11', O: '0E 11 11 11 11 11 0E',
+  P: '1E 11 11 1E 10 10 10', Q: '0E 11 11 11 15 12 0D', R: '1E 11 11 1E 14 12 11',
+  S: '0F 10 10 0E 01 01 1E', T: '1F 04 04 04 04 04 04', U: '11 11 11 11 11 11 0E',
+  V: '11 11 11 11 11 0A 04', W: '11 11 11 15 15 15 0A', X: '11 11 0A 04 0A 11 11',
+  Y: '11 11 0A 04 04 04 04', Z: '1F 01 02 04 08 10 1F',
+  0: '0E 11 13 15 19 11 0E', 1: '04 0C 04 04 04 04 0E', 2: '0E 11 01 02 04 08 1F',
+  3: '1F 02 04 02 01 11 0E', 4: '02 06 0A 12 1F 02 02', 5: '1F 10 1E 01 01 11 0E',
+  6: '06 08 10 1E 11 11 0E', 7: '1F 01 02 04 08 08 08', 8: '0E 11 11 0E 11 11 0E',
+  9: '0E 11 11 0F 01 02 0C',
+  ' ': '00 00 00 00 00 00 00', '-': '00 00 00 1F 00 00 00', '_': '00 00 00 00 00 00 1F',
+  '.': '00 00 00 00 00 0C 0C', ':': '00 0C 0C 00 0C 0C 00', '!': '04 04 04 04 04 00 04',
+  '?': '0E 11 01 02 04 00 04', '+': '00 04 04 1F 04 04 00', '/': '01 01 02 04 08 10 10',
+  '(': '02 04 08 08 08 04 02', ')': '08 04 02 02 02 04 08',
+  '<': '02 04 08 10 08 04 02', '>': '08 04 02 01 02 04 08',
+};
+const GLYPHS = Object.fromEntries(
+  Object.entries(raw).map(([k, v]) => [k, v.split(' ').map((h) => parseInt(h, 16))]),
+);
+
+// Presets are partial overrides of DEFAULTS (see render.js). Add new looks here.
+const PRESETS = {
+  aiphone: { colors: ['#5B6CFF', '#A66BFF'], shadow: '#2B2A6B', weight: 2, depth: 3 },
+  neon:    { colors: ['#00F5D4', '#00BBF9', '#F15BB5'], shadow: '#08305A', weight: 1, depth: 2, animation: 'shimmer' },
+  fire:    { colors: ['#FFD60A', '#FF7B00', '#E5383B'], shadow: '#5A1A12', weight: 2, depth: 3 },
+  mono:    { colors: ['#F2F2F2'], shadow: '#555555', weight: 1, depth: 2 },
+  floor:   { colors: ['#00F5D4', '#00BBF9', '#F15BB5'], shadow: '#08305A', weight: 1, depth: 2, animation: 'floor' },
+  reveal:  { colors: ['#5B6CFF', '#A66BFF'], shadow: '#2B2A6B', weight: 2, depth: 3, animation: 'reveal' },
+  // light mode: ink on paper, transparent by default (saturated colors that stay
+  // readable on a white page; bright pastels would disappear there)
+  light:       { light: true, transparent: true, colors: ['#2F3AE0', '#8A2BE2'], shadow: '#B9B9D6', weight: 2, depth: 3, highlight: 0.18 },
+  'light-sun': { light: true, transparent: true, colors: ['#D2691E', '#C2185B', '#B45309'], shadow: '#E8D5B7', weight: 2, depth: 3, highlight: 0.15 },
+  'light-mint':{ light: true, transparent: true, colors: ['#0F766E', '#0E7490'], shadow: '#C7E5E0', weight: 1, depth: 2, highlight: 0.15, animation: 'shimmer' },
+  'light-ink': { light: true, transparent: true, colors: ['#111827'], shadow: '#D4D4D8', weight: 2, depth: 2, highlight: 0.12 },
+};
+
+// true for presets that already carry the light-mode look
+const isLightPreset = (name) => /^light(-|$)/.test(String(name || ''));
+
+// Pure renderer: renderSvg(text, options) -> SVG string. No DOM or Node dependencies.
+// All sizes are in "cells" (1 cell = 1 pixel of the pixel font); `scale` only sets the output size.
+
+
+
+const DEFAULTS = {
+  scale: 8,            // output size of one cell in px
+  glyphWidth: 100,     // glyph width as a percentage; 100 = original 5x7 proportions
+  taper: false,        // progressively narrow each glyph from left to right
+  spacing: 1,          // cells between letters
+  weight: 1,           // 1 = thin, 2 = bold
+  colors: ['#5B6CFF', '#A66BFF'], // gradient stops (hex), 1..n colors
+  vertical: false,     // gradient runs top to bottom instead of left to right
+  depth: 3,            // 3D shadow depth in cells
+  shadow: '#2B2A6B',   // shadow color (hex)
+  highlight: 0.25,     // opacity of the light top edge (0 = off)
+  animation: 'none',   // none | wave | shimmer | blink | floor | reveal
+  bg: null,            // background color, or null for transparent
+  transparent: false,  // true = never paint a background rect (overrides bg)
+  light: false,        // true = light-mode look (bright shadow, dark shine, framed for white pages)
+  padding: 1,          // margin in cells
+  footer: false,       // append a "powered by" pixel credit under the banner
+};
+
+const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+const mix = (a, b, t) => {
+  const p = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+  const [x, y] = [p(a), p(b)];
+  return '#' + x.map((v, i) => Math.round(v + (y[i] - v) * t).toString(16).padStart(2, '0')).join('');
+};
+
+const toGrid = (rows) => rows.map((r) => Array.from({ length: GLYPH_W }, (_, x) => (r >> (GLYPH_W - 1 - x)) & 1));
+
+// Bold: 2x2 dilation, so a 5x7 glyph becomes 6x8.
+function thicken(g) {
+  const at = (y, x) => g[y]?.[x] || 0;
+  return Array.from({ length: g.length + 1 }, (_, y) =>
+    Array.from({ length: g[0].length + 1 }, (_, x) => at(y, x) | at(y, x - 1) | at(y - 1, x) | at(y - 1, x - 1)));
+}
+
+const face = (g, x, y) => g[y]?.[x] === 1;
+const edge = (g, x, y) => face(g, x, y) && !face(g, x, y - 1); // pixels with nothing above them
+
+// Path built from horizontal runs: much smaller than one <rect> per pixel.
+function runs(g, ox, keep) {
+  let d = '';
+  g.forEach((row, y) => {
+    for (let x = 0; x < row.length; x++) {
+      if (!keep(g, x, y)) continue;
+      const s = x;
+      while (keep(g, x + 1, y)) x++;
+      d += `M${ox + s} ${y}h${x - s + 1}v1h${s - x - 1}z`;
+    }
+  });
+  return d;
+}
+
+function renderSvg(text, opts = {}) {
+  const o = { ...DEFAULTS, ...PRESETS[opts.preset], ...opts };
+  const chars = [...String(text).toUpperCase()];
+  if (!chars.length) throw new Error('Text is empty');
+
+  const grids = chars.map((c) => {
+    const g = toGrid(GLYPHS[c] ?? GLYPHS['?']);
+    return o.weight > 1 ? thicken(g) : g;
+  });
+  const n = grids.length, gh = grids[0].length;
+  const widthScale = Math.max(40, Math.min(160, Number(o.glyphWidth) || 100)) / 100;
+  const taperAmount = o.taper && n > 1 ? 0.28 : 0;
+  const glyphScale = (i) => widthScale * (1 - taperAmount * (i / Math.max(1, n - 1)));
+  const glyphWidths = grids.map((g, i) => g[0].length * glyphScale(i));
+  const wave = o.animation === 'wave' ? 1 : 0;
+  const floor = o.animation === 'floor';
+  const floorH = floor ? 6 : 0;   // gradient floor band below the text
+  const footerH = o.footer ? (2 * (GLYPH_H + 1) + 3) : 0;  // two text lines + gap
+  const W = 2 * o.padding + glyphWidths.reduce((sum, width) => sum + width, 0) + (n - 1) * o.spacing + o.depth;
+  const H = 2 * (o.padding + wave) + gh + o.depth + floorH;
+  const Htotal = H + footerH;
+  const len = o.vertical ? gh + o.depth : W - o.padding;
+  const [x2, y2] = o.vertical ? [0, len] : [len, 0];
+  const colors = o.colors.length > 1 ? o.colors : [o.colors[0], o.colors[0]];
+
+  const stops = colors.map((c, i) => `<stop offset="${(i / (colors.length - 1)).toFixed(3)}" stop-color="${c}"/>`).join('');
+  // shimmer also drives the floor's moving gradient
+  const shimmer = o.animation === 'shimmer' || floor
+    ? `<animateTransform attributeName="gradientTransform" type="translate" from="0 0" to="${o.vertical ? `0 ${2 * len}` : `${2 * len} 0`}" dur="4s" repeatCount="indefinite"/>` : '';
+
+  const ox = (i) => o.padding + glyphWidths.slice(0, i).reduce((sum, width) => sum + width, 0) + i * o.spacing;
+  const defs = grids.map((g, i) => `<path id="g${i}" d="${runs(g, 0, face)}"/>`).join('');
+
+  // light mode: ink on paper — the 3D body below each glyph becomes an emboss
+  // highlight (shadow -> white), shine uses ink instead of white, and the
+  // gradient gets a subtle dark rim so it still reads on a white page.
+  const light = !!o.light;
+  const shadowInk = light ? mix(o.shadow, '#ffffff', 0.62) : o.shadow;
+  const shine = light ? mix(o.colors[0], '#000000', 0.55) : '#fff';
+  const shineOpacity = light ? Math.min(1, o.highlight * 1.6) : o.highlight;
+
+  const reveal = o.animation === 'reveal';
+  const letters = grids.map((g, i) => {
+    const sx = glyphScale(i);
+    let s = '';
+    for (let k = o.depth; k >= 1; k--) {
+      // Compensate the x offset so glyph compression does not flatten the 3D depth.
+      s += `<use href="#g${i}" x="${(k / sx).toFixed(3)}" y="${k}" fill="${mix(shadowInk, light ? '#ffffff' : '#000000', ((k - 1) / (o.depth || 1)) * 0.5)}"/>`;
+    }
+    s += `<use href="#g${i}" fill="url(#f)"/>`;
+    if (light) s += `<path d="${runs(g, 0, face)}" fill="none" stroke="${mix(o.colors[0], '#000000', 0.5)}" stroke-width="0.5" stroke-opacity="0.35"/>`;
+    if (o.highlight > 0) s += `<path d="${runs(g, 0, edge)}" fill="${shine}" fill-opacity="${shineOpacity}"/>`;
+    if (wave) s += `<animateTransform attributeName="transform" type="translate" values="0 0;0 -1;0 0" dur="1.2s" begin="${(i * 0.12).toFixed(2)}s" repeatCount="indefinite"/>`;
+    const revealBase = reveal ? ' opacity="0" transform="translate(0 3)" filter="url(#blur)"' : '';
+    return `<g transform="translate(${ox(i)} 0) scale(${sx.toFixed(4)} 1)"><g${revealBase}>${s}${reveal ? revealFx(i) : ''}</g></g>`;
+  }).join('');
+
+  const blink = o.animation === 'blink' ? '<animate attributeName="opacity" values="1;.35;1" dur="1.6s" repeatCount="indefinite"/>' : '';
+  // transparent wins over bg -> no rect at all, so the SVG can sit on any page color
+  const paintBg = !o.transparent && !!o.bg;
+  const bg = paintBg ? `<rect width="${W}" height="${Htotal}" fill="${o.bg}"/>` : '';
+
+  const floorBand = floor ? floorFx(o, W, floorH) : '';
+  const footer = o.footer ? footerFx(o, W, H) : '';
+
+  // aria-label + responsive: width/height only hint the intrinsic size, CSS max-width keeps it fluid
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${Htotal}" width="${W * o.scale}" height="${Htotal * o.scale}" preserveAspectRatio="xMidYMid meet" shape-rendering="crispEdges" role="img" aria-label="${esc(String(text))}">`
+    + `<title>${esc(String(text))}</title><defs>${defs}${reveal ? blurFilter() : ''}<linearGradient id="f" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="${x2}" y2="${y2}" spreadMethod="reflect">${stops}${shimmer}</linearGradient></defs>`
+    + `${bg}<g transform="translate(0 ${o.padding + wave})">${blink}${letters}</g>`
+    + `${floorBand}${footer}</svg>`;
+}
+
+// text-reveal: each letter fades in with a rise + blur, staggered left to right.
+// `begin` is a time offset in seconds; keyTimes are normalized fractions and must
+// stay within 0..1. Mixing the two was why longer words stopped revealing.
+function revealFx(i) {
+  const delay = (i * 0.18).toFixed(2);
+  return `<animate attributeName="opacity" values="0;1" dur="0.7s" begin="${delay}s" fill="freeze"/>`
+    + `<animateTransform attributeName="transform" type="translate" values="0 3;0 0" dur="0.7s" begin="${delay}s" fill="freeze"/>`
+    + `<animate attributeName="filter" values="url(#blur);none" dur="0.7s" begin="${delay}s" fill="freeze"/>`;
+}
+
+function blurFilter() {
+  return `<filter id="blur" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="1.5"/></filter>`;
+}
+
+// gradient-floor: a soft wavy light band sweeping along the floor under the text.
+function floorFx(o, W, floorH) {
+  const rows = [];               // each row = one horizontal light band, dimmer toward the bottom
+  const top = 2 * (o.padding + (o.animation === 'wave' ? 1 : 0)) + 7 + o.depth + (o.weight > 1 ? 1 : 0);
+  const c0 = o.colors[0], c1 = o.colors[o.colors.length - 1];
+  for (let r = 0; r < floorH; r++) {
+    const t = (r + 1) / floorH;  // 0 at the top band, 1 at the bottom
+    const col = mix(c1, c0, 0.25 + 0.75 * t);
+    rows.push(`<rect x="0" y="${top + r}" width="${W}" height="1" fill="${col}" fill-opacity="${(0.9 * (1 - t) + 0.1).toFixed(3)}">
+      <animate attributeName="x" values="0;-${2 * W};0" dur="${(3 + t * 5).toFixed(1)}s" repeatCount="indefinite"/>
+    </rect>`);
+  }
+  return `<g shape-rendering="crispEdges">${rows.join('')}</g>`;
+}
+
+// powered-by credit: small pixel text + repo link, rendered in the banner style.
+function footerFx(o, W, H) {
+  const label = 'POWERED BY PIXEL-BANNER';
+  const url = 'GITHUB.COM/IAMANGUSU/PIXEL-BANNER';
+  const gh2 = GLYPH_H + 1;        // 1 blank row between lines
+  const line = (s) => {
+    const grids = [...s].map((c) => toGrid(GLYPHS[c] ?? GLYPHS['?']));
+    const n = grids.length, gw = grids[0][0].length, sp = 2;
+    const w = n * gw + (n - 1) * sp;
+    const ox = (i) => i * (gw + sp);
+    const d = grids.map((g, i) => runs(g, ox(i), face)).join('');
+    return { d, w };
+  };
+  const l1 = line(label);
+  const l2 = line(url);
+  const fw = Math.max(l1.w, l2.w);
+  const fx0 = Math.max(1, Math.round((W - fw) / 2));   // centered
+  const fy0 = H + 2;                                    // 2 cells below the banner
+  const c0 = o.colors[0], c1 = o.colors[o.colors.length - 1];
+  const fills = o.colors.length > 1 ? o.colors : [c0, c0];
+  // on a light page a bright gradient disappears: darken the credit so it stays readable
+  const ink = o.light ? fills.map((c) => mix(c, '#000000', 0.45)) : fills;
+  const id = (o._footerId = (o._footerId || 0) + 1);
+  const fgrad = `<linearGradient id="ff${id}" gradientUnits="userSpaceOnUse" x1="${fx0}" y1="0" x2="${fx0 + fw}" y2="0">`
+    + ink.map((c, i) => `<stop offset="${i / (ink.length - 1)}" stop-color="${c}"/>`).join('') + `</linearGradient>`;
+  return `<g font-family="none" shape-rendering="crispEdges"><a href="https://github.com/iamangusu/pixel-banner" target="_blank" rel="noopener">`
+    + `<g transform="translate(${fx0} ${fy0})" fill="url(#ff${id})">`
+    + `<path d="${l1.d}"/>`
+    + `<path d="${l2.d}" transform="translate(0 ${gh2})"/>`
+    + `</g></a></g>` + fgrad;
+}
+
+return { renderSvg, DEFAULTS, PRESETS };
+})();
+</script>
+<script>
+(() => {
+const { renderSvg, DEFAULTS, PRESETS } = PixelBanner;
+const $ = (id) => document.getElementById(id);
+let svg = '';
+
+const say = (t) => { $('msg').textContent = t ? '✓ ' + t : ''; };
+const slug = () => $('text').value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'pixel-banner';
+
+function opts() {
+  const colors = [$('c1').value, $('c2').value];
+  if ($('use3').checked) colors.push($('c3').value);
+  const transparent = !$('useBg').checked;
+  return { colors, shadow: $('shadow').value, scale: +$('scale').value, glyphWidth: +$('glyphWidth').value, taper: $('taper').checked, depth: +$('depth').value,
+    spacing: +$('spacing').value, highlight: $('highlight').value / 100, weight: +$('weight').value,
+    animation: $('animation').value, vertical: $('dir').value === 'v', light: $('light').checked,
+    transparent, bg: $('useBg').checked ? $('bg').value : null };
+}
+
+function draw(event) {
+  if (event && event.target && event.target.id === 'scalePx') {
+    const raw = $('scalePx').value;
+    if (raw === '') return;
+    const value = Math.max(2, Math.min(20, Number(raw) || 2));
+    $('scale').value = value; $('scalePx').value = value;
+  } else { $('scalePx').value = $('scale').value; }
+  ['depth', 'spacing'].forEach((k) => { $('o-' + k).textContent = $(k).value; });
+  $('o-glyphWidth').textContent = $('glyphWidth').value + '%';
+  $('o-highlight').textContent = $('highlight').value + '%';
+  document.querySelectorAll('input[type=range]').forEach((el) => {
+    const min = Number(el.min || 0), max = Number(el.max || 100), value = Number(el.value || 0);
+    el.style.setProperty('--range-progress', `${((value - min) / Math.max(1, max - min)) * 100}%`);
+  });
+  $('dlHint').textContent = 'save ' + slug() + '.svg';
+  const stage = $('stage');
+  const light = $('light').checked;
+  // light mode -> light board (dark ink needs it); transparent -> checkerboard so
+  // "no background" is actually visible instead of looking like a dark box
+  stage.classList.toggle('on-light', light);
+  stage.classList.toggle('checker', !$('useBg').checked);
+  $('c3').disabled = !$('use3').checked;
+  $('bg').disabled = !$('useBg').checked;
+  try {
+    svg = renderSvg($('text').value, opts());
+    // safe: renderSvg is our own renderer; user text is escaped there (<title>/aria-label)
+    stage.innerHTML = svg;
+    $('code').value = svg;
+    const size = svg.match(/width="([\d.]+)" height="([\d.]+)"/);
+    $('stageInfo').textContent = size ? `${size[1]} × ${size[2]} PX / ${[...$('text').value].length} GLYPHS` : 'SVG READY';
+  } catch (e) {
+    svg = '';
+    stage.innerHTML = '<p>TYPE TEXT TO GENERATE SVG</p>';
+    $('stageInfo').textContent = 'WAITING FOR INPUT';
+  }
+}
+
+function applyPreset(name) {
+  const p = { ...DEFAULTS, ...PRESETS[name] };
+  const [a, b, c] = p.colors;
+  $('c1').value = a; $('c2').value = b || a; $('c3').value = c || b || a; $('use3').checked = p.colors.length > 2;
+  $('shadow').value = p.shadow; $('scale').value = p.scale; $('scalePx').value = p.scale; $('glyphWidth').value = p.glyphWidth ?? DEFAULTS.glyphWidth; $('taper').checked = !!p.taper; $('depth').value = p.depth; $('spacing').value = p.spacing;
+  $('highlight').value = Math.round(p.highlight * 100); $('weight').value = p.weight;
+  $('animation').value = p.animation; $('dir').value = p.vertical ? 'v' : 'h';
+  $('light').checked = !!p.light;
+  $('useBg').checked = !!p.bg;
+  if (p.bg) $('bg').value = p.bg;
+}
+
+async function save(name, text, type) {
+  try {
+    const d = await (window.claude && window.claude.use ? window.claude.use('downloads') : null);
+    if (d) { await d.save({ filename: name, data: text }); return; }
+  } catch (e) { if (e && e.code === 'declined') return; }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], { type }));
+  a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+async function copy(text, ok) {
+  try { await navigator.clipboard.writeText(text); say(ok); }
+  catch (e) {
+    document.querySelector('details').open = true;
+    $('code').value = text; $('code').select();
+    say('copy was blocked, text is selected: copy it manually');
+  }
+}
+
+$('preset').innerHTML = Object.keys(PRESETS).map((k) => `<option>${k}</option>`).join('');
+document.querySelectorAll('input,select').forEach((el) => { if (el.id !== 'preset' && el.id !== 'uiTheme' && el.id !== 'scalePx') { el.addEventListener('input', draw); el.addEventListener('change', draw); } });
+$('scalePx').addEventListener('input', () => {
+  const raw = $('scalePx').value;
+  if (raw === '') return;
+  const value = Number(raw);
+  if (Number.isFinite(value) && value >= 2 && value <= 20) { $('scale').value = value; draw({ target: $('scale') }); }
+});
+$('scalePx').addEventListener('change', () => {
+  const value = Math.max(2, Math.min(20, Math.round(Number($('scalePx').value) || 8)));
+  $('scale').value = value; $('scalePx').value = value; draw();
+});
+$('preset').addEventListener('change', () => { applyPreset($('preset').value); draw(); });
+
+// UI theme (separate from the banner's light mode): auto follows the OS
+const setTheme = (t) => {
+  document.documentElement.dataset.theme = t === 'auto' ? '' : t;
+  if (t === 'auto') delete document.documentElement.dataset.theme;
+  try { localStorage.setItem('pb-theme', t); } catch (e) {}
+};
+$('uiTheme').addEventListener('change', () => setTheme($('uiTheme').value));
+try {
+  const saved = localStorage.getItem('pb-theme');
+  if (saved) { $('uiTheme').value = saved; }
+} catch (e) {}
+setTheme($('uiTheme').value);
+const need = (fn) => () => (svg ? fn() : say('type some text first'));
+$('dl').onclick = need(() => save(slug() + '.svg', svg, 'image/svg+xml'));
+$('cpMd').onclick = need(() => copy(`![${$('text').value}](assets/${slug()}.svg)`, 'markdown copied'));
+$('cpSvg').onclick = need(() => copy(svg, 'svg code copied'));
+document.addEventListener('keydown', (e) => {
+  if (e.metaKey || e.ctrlKey || e.altKey || /INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) return;
+  const id = { 1: 'dl', 2: 'cpMd', 3: 'cpSvg' }[e.key];
+  if (id) $(id).click();
+});
+
+applyPreset('aiphone'); draw();
+})();
+</script></body></html>

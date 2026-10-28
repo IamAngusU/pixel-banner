@@ -1,0 +1,22 @@
+{
+  "name": "pixel-banner",
+  "version": "1.0.0",
+  "description": "Pixel-art text banners as SVG, with 3D shadow, gradients and animation (wave/shimmer/blink/floor/reveal). For GitHub READMEs and websites.",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": { ".": "./src/index.js" },
+  "bin": { "pixel-banner": "src/cli.js" },
+  "files": ["src", "docs", "assets"],
+  "scripts": {
+    "build": "node scripts/build-web.mjs && node scripts/gen-assets.mjs",
+    "preview": "node scripts/build-web.mjs && node scripts/serve.mjs",
+    "test": "node --test"
+  },
+  "repository": { "type": "git", "url": "git+https://github.com/iamangusu/pixel-banner.git" },
+  "homepage": "https://iamangusu.github.io/pixel-banner/",
+  "bugs": { "url": "https://github.com/iamangusu/pixel-banner/issues" },
+  "keywords": ["svg", "pixel-art", "banner", "readme", "github", "text", "generator"],
+  "author": { "name": "Angus Uelsmann", "url": "https://github.com/iamangusu" },
+  "license": "MIT",
+  "engines": { "node": ">=18" }
+}

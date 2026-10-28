@@ -1,0 +1,118 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { renderSvg, PRESETS, GLYPHS, GLYPH_H } from '../src/index.js';
+
+test('renders a valid, scalable svg', () => {
+  const svg = renderSvg('HI');
+  assert.match(svg, /^<svg [^>]*viewBox="0 0 \d+ \d+"/);
+  assert.ok(svg.endsWith('</svg>'));
+  assert.ok(!svg.includes('NaN') && !svg.includes('undefined'));
+});
+
+test('scale changes the output size, not the viewBox', () => {
+  const a = renderSvg('HI', { scale: 4 }), b = renderSvg('HI', { scale: 8 });
+  assert.equal(a.match(/viewBox="[^"]+"/)[0], b.match(/viewBox="[^"]+"/)[0]);
+  assert.equal(2 * +a.match(/ width="(\d+)"/)[1], +b.match(/ width="(\d+)"/)[1]);
+});
+
+test('empty text throws, unknown characters fall back to "?"', () => {
+  assert.throws(() => renderSvg(''));
+  const glyph = (s) => s.match(/<path id="g0" d="[^"]*"/)[0];
+  assert.equal(glyph(renderSvg('@')), glyph(renderSvg('?')));
+});
+
+// --- light mode & transparency -------------------------------------------
+
+test('transparent: no background rect, an explicit bg paints one', () => {
+  assert.ok(!/<rect width=/.test(renderSvg('A')), 'default is transparent');
+  assert.ok(!/<rect width=/.test(renderSvg('A', { transparent: true, bg: '#000' })), 'transparent wins over bg');
+  assert.match(renderSvg('A', { bg: '#101018' }), /<rect width="\d+" height="\d+" fill="#101018"\/>/);
+});
+
+test('light mode: no bg rect, dark ink, embossed shadow, no white shine', () => {
+  const svg = renderSvg('A', { preset: 'light', footer: true });
+  assert.ok(!/<rect width=/.test(svg), 'light preset is transparent');
+  assert.match(svg, /fill="none" stroke="#[0-9a-f]{6}" stroke-width="0\.5"/);   // ink rim
+  assert.ok(!/fill="#fff"/.test(svg), 'no white shine in light mode');
+  assert.ok(!svg.includes('NaN') && !svg.includes('undefined') && svg.endsWith('</svg>'));
+});
+
+test('light mode darkens the footer credit for white pages', () => {
+  const dark = renderSvg('A', { footer: true, colors: ['#ffffff', '#ffffff'], shadow: '#000' });
+  const light = renderSvg('A', { footer: true, light: true, colors: ['#ffffff', '#ffffff'], shadow: '#000' });
+  const stop = (s) => s.match(/id="ff\d+" gradientUnits[^>]*><stop offset="0(?:\.0+)?" stop-color="(#[0-9a-f]{6})"/)[1];
+  assert.equal(stop(dark), '#ffffff');
+  assert.notEqual(stop(light), '#ffffff');
+});
+
+test('svg is responsive: viewBox + preserveAspectRatio, no fixed CSS', () => {
+  const svg = renderSvg('HI', { scale: 8 });
+  assert.match(svg, /viewBox="0 0 \d+ \d+"/);
+  assert.match(svg, /preserveAspectRatio="xMidYMid meet"/);
+  assert.match(svg, /aria-label="HI"/);
+  assert.ok(!/style=/.test(svg), 'sizing is left to CSS max-width');
+});
+
+test('animations add the expected elements', () => {
+  assert.match(renderSvg('A', { animation: 'wave' }), /animateTransform[^>]*type="translate"/);
+  assert.match(renderSvg('A', { animation: 'shimmer' }), /gradientTransform/);
+  assert.match(renderSvg('A', { animation: 'blink' }), /attributeName="opacity"/);
+  assert.ok(!renderSvg('A').includes('<animate'));
+});
+
+test('every preset renders', () => {
+  for (const preset of Object.keys(PRESETS)) assert.ok(renderSvg('TEST', { preset }));
+});
+
+test('font data is well-formed', () => {
+  for (const [ch, rows] of Object.entries(GLYPHS)) {
+    assert.equal(rows.length, GLYPH_H, ch);
+    assert.ok(rows.every((r) => r >= 0 && r < 32), ch);
+  }
+});
+
+test('floor animation adds a gradient floor band', () => {
+  const svg = renderSvg('HI', { animation: 'floor' });
+  assert.ok(svg.includes('reflect'), 'gradient spreadMethod reflect present');
+  assert.ok(svg.includes('animateTransform'), 'floor drives a moving gradient');
+  assert.ok(!svg.includes('NaN') && !svg.includes('undefined'));
+});
+
+test('reveal animation staggers every letter, including long text', () => {
+  const svg = renderSvg('ABCDEFGHIJKLMNOPQRST', { animation: 'reveal' });
+  const fades = [...svg.matchAll(/<animate attributeName="opacity" values="0;1" dur="0\.7s" begin="([\d.]+)s" fill="freeze"\/>/g)];
+  const times = fades.map((m) => Number(m[1]));
+  assert.equal(times.length, 20, 'all 20 letters get a reveal animation');
+  assert.equal(times[0], 0, 'the first letter starts immediately');
+  assert.equal(times[1], 0.18, 'the next letter is staggered');
+  assert.equal(times.at(-1), 3.42, 'the last letter still gets a valid delay');
+  assert.match(svg, /<g opacity="0" transform="translate\(0 3\)" filter="url\(#blur\)">/, 'letters start hidden, raised, and blurred before their delay');
+  assert.ok(!/keyTimes="0;[1-9]/.test(svg), 'seconds are not incorrectly used as normalized keyTimes');
+  assert.match(svg, /attributeName="filter" values="url\(#blur\);none"/);
+});
+
+test('footer renders powered-by credit with repo link', () => {
+  const svg = renderSvg('HI', { footer: true });
+  assert.ok(svg.includes('github.com/iamangusu/pixel-banner'), 'href present');
+  assert.match(svg, /<a href=[^>]*github\.com\/iamangusu\/pixel-banner/, 'anchor wraps credit');
+  assert.ok(svg.includes('url(#ff'), 'footer has its own gradient');
+  assert.ok(!svg.includes('path d="<path'), 'no nested path bug');
+});
+
+
+test('glyph width changes geometry while keeping SVG valid', () => {
+  const normal = renderSvg('TEST', { glyphWidth: 100 });
+  const narrow = renderSvg('TEST', { glyphWidth: 60 });
+  const wide = renderSvg('TEST', { glyphWidth: 140 });
+  const width = (svg) => Number(svg.match(/viewBox="0 0 ([\d.]+) /)[1]);
+  assert.ok(width(narrow) < width(normal), 'narrow glyphs reduce the viewBox width');
+  assert.ok(width(wide) > width(normal), 'wide glyphs expand the viewBox width');
+  assert.ok(!narrow.includes('NaN') && !narrow.includes('undefined'));
+});
+
+test('taper progressively compresses glyphs from left to right', () => {
+  const svg = renderSvg('ABCD', { taper: true });
+  assert.match(svg, /scale\(1\.0000 1\)/, 'first letter keeps the selected width');
+  assert.match(svg, /scale\(0\.7200 1\)/, 'last letter narrows by 28 percent');
+  assert.ok(!svg.includes('NaN') && svg.endsWith('</svg>'));
+});
