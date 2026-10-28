@@ -70,6 +70,21 @@ test('gradient faces use shared banner coordinates so shimmer spans the text', (
   assert.match(svg, /<animateTransform attributeName="gradientTransform"/);
 });
 
+test('shimmer adds a moving bright band over the face gradient', () => {
+  const svg = renderSvg('AB', { animation: 'shimmer', depth: 0, highlight: 0 });
+  assert.match(svg, /<linearGradient id="shine"[^>]*>/);
+  assert.match(svg, /stop-color="#fff" stop-opacity="0\.85"/);
+  assert.match(svg, /fill="url\(#shine\)"/);
+  assert.match(svg, /<animateTransform attributeName="gradientTransform"[^>]*dur="2\.6s"/);
+});
+
+test('renderer keeps any requested number of gradient stops', () => {
+  const colors = ['#ff0000', '#ff8800', '#ffff00', '#00ff88', '#0088ff'];
+  const svg = renderSvg('A', { colors });
+  const gradient = svg.match(/<linearGradient id="f"[^>]*>([\s\S]*?)<\/linearGradient>/)[1];
+  assert.equal([...gradient.matchAll(/<stop\b/g)].length, colors.length);
+});
+
 test('every preset renders', () => {
   for (const preset of Object.keys(PRESETS)) assert.ok(renderSvg('TEST', { preset }));
 });

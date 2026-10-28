@@ -28,7 +28,7 @@ Add the result to a README:
 
 ## Icon marquee
 
-[![JavaScript, Node.js, npm and GitHub icons](https://angusu.de/icon-marquee/api/IamAngusU/pixel-banner.svg?include=javascript,nodejs,npm,github&height=56&gap=14&width=680&speed=40&edgeFade=24)](https://angusu.de/icon-marquee/)
+[![JavaScript, Node.js, npm and GitHub icons](https://angusu.de/icon-marquee/api/IamAngusU/pixel-banner.svg?include=javascript,nodejs,npm,github&height=56&gap=14&width=680&speed=40&edgeFade=24)](https://github.com/IamAngusU/icon-marquee)
 
 Made with the [Icon Marquee](https://github.com/IamAngusU/icon-marquee) generator.
 

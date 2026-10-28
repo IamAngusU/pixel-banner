@@ -17,6 +17,7 @@ main{padding:clamp(12px,3vw,34px)}.win{max-width:880px;margin:0 auto;border:1px 
 input[type=color]{appearance:none;width:34px;height:30px;padding:3px;border:1px solid var(--line);border-radius:5px;background:var(--field);cursor:pointer}input[type=color]::-webkit-color-swatch-wrapper{padding:2px}input[type=color]::-webkit-color-swatch{border:0;border-radius:3px}input[type=color]::-moz-color-swatch{border:0;border-radius:3px}
 input[type=range]{--range-progress:50%;appearance:none;-webkit-appearance:none;width:100%;max-width:31ch;height:22px;margin:0;background:transparent;cursor:pointer;touch-action:pan-y}input[type=range]::-webkit-slider-runnable-track{height:4px;border:0;border-radius:4px;background:linear-gradient(90deg,var(--a) 0 var(--range-progress),var(--track) var(--range-progress) 100%);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--line) 50%,transparent)}input[type=range]::-moz-range-track{height:4px;border:0;border-radius:4px;background:var(--track)}input[type=range]::-moz-range-progress{height:4px;border-radius:4px;background:var(--a)}input[type=range]::-webkit-slider-thumb{appearance:none;width:13px;height:13px;border:2px solid var(--a);border-radius:4px;background:var(--win);margin-top:-4.5px;box-shadow:0 0 0 3px color-mix(in srgb,var(--a) 12%,transparent)}input[type=range]::-moz-range-thumb{width:10px;height:10px;border:2px solid var(--a);border-radius:4px;background:var(--win);box-shadow:0 0 0 3px color-mix(in srgb,var(--a) 12%,transparent)}input[type=range]:focus-visible{outline:0}input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 4px color-mix(in srgb,var(--a) 24%,transparent)}
 .readout{display:flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:5px;background:var(--field);padding:3px 7px}.readout input{font:inherit;color:var(--a);background:transparent;border:0;outline:0;width:3.5ch;text-align:right;padding:0}.readout span{font-size:10px;color:var(--dim)}output{display:inline-block;color:var(--a);background:color-mix(in srgb,var(--a) 7%,var(--field));border:1px solid color-mix(in srgb,var(--a) 22%,var(--line));border-radius:4px;min-width:5.3ch;text-align:center;padding:2px 6px;font-size:10px;font-variant-numeric:tabular-nums}.chk{display:inline-flex;align-items:center;gap:7px;color:var(--ink);cursor:pointer;user-select:none}.chk input[type=checkbox]{appearance:none;-webkit-appearance:none;display:inline-grid;place-content:center;width:15px;height:15px;margin:0;border:1px solid var(--dim);border-radius:3px;background:var(--field);cursor:pointer;flex:none}.chk input[type=checkbox]::after{content:"";width:7px;height:4px;border:solid var(--win);border-width:0 0 2px 2px;transform:rotate(-45deg) scale(0);transform-origin:center;transition:transform .12s ease}.chk input[type=checkbox]:checked{background:var(--a);border-color:var(--a)}.chk input[type=checkbox]:checked::after{transform:rotate(-45deg) scale(1)}.chk:hover{color:var(--a)}.explain{color:var(--dim);font-size:10px}.disabled-note{opacity:.45}.menu{margin-top:18px;padding-top:12px;border-top:1px solid var(--line)}.menu-title{display:flex;align-items:center;gap:10px;color:var(--dim);font-size:10px;letter-spacing:.14em;margin:0 0 8px}.menu-title::after{content:"";height:1px;flex:1;background:var(--line)}.item{display:flex;align-items:center;flex-wrap:wrap;gap:0 1.5ch;width:100%;text-align:left;background:none;border:0;color:var(--ink);font:inherit;padding:6px 0;cursor:pointer}.item .mk{visibility:hidden;color:var(--a);width:1ch}.item .k,.item .d{color:var(--dim)}.item .t{min-width:17ch}.item:hover .mk,.item:focus-visible .mk{visibility:visible}.item:hover .t,.item:focus-visible .t{color:var(--a)}details summary{list-style:none;cursor:pointer;padding:6px 0}details summary::-webkit-details-marker{display:none}summary .k{color:var(--dim)}details[open] summary .mk{visibility:visible;transform:rotate(90deg)}.item .mk{display:inline-block;transition:transform .15s ease}textarea{display:block;width:100%;height:140px;margin-top:7px;font:12px/1.5 ui-monospace,monospace;color:var(--ink);background:var(--field);border:1px solid var(--line);border-radius:5px;padding:10px;resize:vertical}#msg{min-height:1.55em;margin:10px 0 0;color:var(--ok);font-size:11px}.hint{margin:7px 0 0;color:var(--dim);font-size:10px}.sr-label{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}:focus-visible{outline:2px solid var(--a);outline-offset:3px}input:disabled{opacity:.35;cursor:not-allowed}input[type=color]:disabled{filter:saturate(.35)}
+.gradient-controls{display:grid;gap:8px;min-width:0}.gradient-stops{display:flex;align-items:center;flex-wrap:wrap;gap:7px}.gradient-stop{display:inline-flex;align-items:center;gap:4px;padding:3px 5px;border:1px solid var(--line);border-radius:5px;background:var(--field)}.gradient-stop input[type=color]{width:30px;height:26px}.gradient-stop span{font-size:9px;color:var(--dim);font-variant-numeric:tabular-nums}.gradient-actions{display:flex;align-items:center;flex-wrap:wrap;gap:7px}.gradient-actions button{font:inherit;font-size:10px;color:var(--a);background:var(--field);border:1px solid var(--line);border-radius:4px;padding:4px 7px;cursor:pointer}.gradient-actions button:hover{border-color:var(--a)}.gradient-actions button:disabled{opacity:.4;cursor:not-allowed}#stopCount{font-size:10px;color:var(--dim)}
 @media(max-width:560px){main{padding:8px}.win{border-radius:8px}.bar{padding:10px 12px}.bar-title{margin-left:2px;text-align:left}.bar-right{display:none}.head{gap:10px;flex-direction:column}.heading-line h1{font-size:22px}.live{align-self:flex-start}.preview-bar{font-size:9px}.stage{min-height:125px;padding:14px}.row{grid-template-columns:9ch minmax(0,1fr);gap:0 8px}.section-note{font-size:8px}.ctl{gap:7px}input[type=range]{max-width:100%;flex:1;min-width:85px}.readout{flex:none}.item .d{width:100%;padding-left:calc(2ch + 1.5ch)}.colorrow{row-gap:7px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;scroll-behavior:auto!important}}
 </style></head><body><main>
@@ -44,7 +45,7 @@ input[type=range]{--range-progress:50%;appearance:none;-webkit-appearance:none;w
 
   <section class="control-section">
    <div class="section-head"><span class="section-num">03</span><span class="section-title">COLOR & LIGHT</span><span class="section-note">GRADIENT / MATERIAL</span></div>
-   <div class="row colorrow"><span class="row-label">Gradient stops</span><div class="ctl"><input type="color" id="c1" aria-label="First gradient color" title="First gradient color"><input type="color" id="c2" aria-label="Second gradient color" title="Second gradient color"><input type="color" id="c3" aria-label="Third gradient color" title="Third gradient color"><label class="chk" title="Add a third stop to the color gradient"><input type="checkbox" id="use3"> 3-stop gradient</label></div></div>
+   <div class="row colorrow"><span class="row-label">Gradient stops</span><div class="ctl gradient-controls"><div id="gradientStops" class="gradient-stops" aria-label="Gradient colors"></div><div class="gradient-actions"><button id="addStop" type="button">+ Add stop</button><button id="removeStop" type="button">− Remove last</button><span id="stopCount" aria-live="polite"></span></div></div></div>
    <div class="row"><label for="shadow">Shadow tint</label><div class="ctl"><input type="color" id="shadow" aria-label="Shadow tint"></div></div>
    <div class="row"><label for="highlight">Top-edge shine</label><div class="ctl"><input type="range" id="highlight" min="0" max="60" step="1" value="25"><output id="o-highlight">25%</output></div></div>
    <div class="row"><label for="dir">Gradient axis</label><div class="ctl"><select id="dir"><option value="h">Horizontal →</option><option value="v">Vertical ↓</option></select></div></div>
@@ -83,13 +84,36 @@ const say = (t) => { $('msg').textContent = t ? '✓ ' + t : ''; };
 const slug = () => $('text').value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'pixel-banner';
 
 function opts() {
-  const colors = [$('c1').value, $('c2').value];
-  if ($('use3').checked) colors.push($('c3').value);
+  const colors = gradientColors();
   const transparent = !$('useBg').checked;
   return { colors, shadow: $('shadow').value, scale: +$('scale').value, glyphWidth: +$('glyphWidth').value, taper: $('taper').checked, depth: +$('depth').value,
     spacing: +$('spacing').value, highlight: $('highlight').value / 100, weight: +$('weight').value,
     animation: $('animation').value, vertical: $('dir').value === 'v', light: $('light').checked,
     transparent, bg: $('useBg').checked ? $('bg').value : null };
+}
+
+function gradientColors() {
+  return [...$('gradientStops').querySelectorAll('input[type=color]')].map((input) => input.value);
+}
+
+function setGradientStops(colors) {
+  const host = $('gradientStops');
+  host.replaceChildren();
+  colors.forEach((color, index) => {
+    const label = document.createElement('label');
+    label.className = 'gradient-stop';
+    const input = document.createElement('input');
+    input.type = 'color';
+    input.value = color;
+    input.setAttribute('aria-label', `Gradient stop ${index + 1}`);
+    input.title = `Gradient stop ${index + 1}`;
+    const number = document.createElement('span');
+    number.textContent = String(index + 1).padStart(2, '0');
+    label.append(input, number);
+    host.append(label);
+  });
+  $('stopCount').textContent = `${colors.length} stop${colors.length === 1 ? '' : 's'}`;
+  $('removeStop').disabled = colors.length <= 1;
 }
 
 function draw(event) {
@@ -113,7 +137,6 @@ function draw(event) {
   // "no background" is actually visible instead of looking like a dark box
   stage.classList.toggle('on-light', light);
   stage.classList.toggle('checker', !$('useBg').checked);
-  $('c3').disabled = !$('use3').checked;
   $('bg').disabled = !$('useBg').checked;
   try {
     svg = renderSvg($('text').value, opts());
@@ -132,8 +155,7 @@ function draw(event) {
 function applyPreset(name) {
   const p = { ...DEFAULTS, ...PRESETS[name] };
   $('preset').value = name;
-  const [a, b, c] = p.colors;
-  $('c1').value = a; $('c2').value = b || a; $('c3').value = c || b || a; $('use3').checked = p.colors.length > 2;
+  setGradientStops(p.colors);
   $('shadow').value = p.shadow; $('scale').value = p.scale; $('scalePx').value = p.scale; $('glyphWidth').value = p.glyphWidth ?? DEFAULTS.glyphWidth; $('taper').checked = !!p.taper; $('depth').value = p.depth; $('spacing').value = p.spacing;
   $('highlight').value = Math.round(p.highlight * 100); $('weight').value = p.weight;
   $('animation').value = p.animation; $('dir').value = p.vertical ? 'v' : 'h';
@@ -164,6 +186,10 @@ async function copy(text, ok) {
 
 $('preset').innerHTML = Object.keys(PRESETS).map((k) => `<option>${k}</option>`).join('');
 document.querySelectorAll('input,select').forEach((el) => { if (el.id !== 'preset' && el.id !== 'uiTheme' && el.id !== 'scalePx') { el.addEventListener('input', draw); el.addEventListener('change', draw); } });
+$('gradientStops').addEventListener('input', draw);
+$('gradientStops').addEventListener('change', draw);
+$('addStop').addEventListener('click', () => { const colors = gradientColors(); setGradientStops([...colors, colors.at(-1) || '#A66BFF']); draw(); });
+$('removeStop').addEventListener('click', () => { const colors = gradientColors(); if (colors.length > 1) { setGradientStops(colors.slice(0, -1)); draw(); } });
 $('scalePx').addEventListener('input', () => {
   const raw = $('scalePx').value;
   if (raw === '') return;
