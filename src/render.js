@@ -100,7 +100,9 @@ export function renderSvg(text, opts = {}) {
   const stops = colors.map((c, i) => `<stop offset="${(i / (colors.length - 1)).toFixed(3)}" stop-color="${c}"/>`).join('');
   // Move the selected color gradient across the letters. When combined with
   // reveal, begin the color sweep after the last glyph has appeared.
-  const motionBegin = reveal ? `${((n - 1) * 0.18 + 0.7).toFixed(2)}s` : '0s';
+  const revealDuration = Math.max(0.05, Number(o.revealDuration) || DEFAULTS.revealDuration);
+  const revealStagger = Math.max(0, Number(o.revealStagger) || 0);
+  const motionBegin = reveal ? `${((n - 1) * revealStagger + revealDuration).toFixed(2)}s` : '0s';
   // Animate gradient endpoints directly for reliable SVG animation in WebKit and other renderers.
   // Moving both endpoints by two gradient lengths preserves the spreadMethod="reflect" cycle.
   const gradientMotion = shimmerEnabled
