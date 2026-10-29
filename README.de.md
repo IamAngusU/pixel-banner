@@ -41,6 +41,7 @@ Füge die SVG in deine README ein:
 ```
 
 Die Anzahl der Verlaufsfarben bestimmst du selbst: Übergib mit `--colors` eine oder mehrere kommagetrennte Farben.
+Jede generierte SVG enthält außerdem einen unsichtbaren Quelltext-Kommentar mit dem Link zu diesem Repository.
 
 ## Icon Marquee
 

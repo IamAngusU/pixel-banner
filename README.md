@@ -41,6 +41,7 @@ Embed the SVG in your README:
 ```
 
 Gradient stop count is up to you: pass one or more comma-separated colors with `--colors`.
+Every generated SVG also includes a hidden source comment linking back to this repository.
 
 ## Icon Marquee
 

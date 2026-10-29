@@ -263,7 +263,7 @@ function renderSvg(text, opts = {}) {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${Htotal}" width="${W * o.scale}" height="${Htotal * o.scale}" preserveAspectRatio="xMidYMid meet" shape-rendering="crispEdges" role="img" aria-label="${esc(String(text))}">`
     + `<title>${esc(String(text))}</title><defs>${defs}${reveal ? blurFilter() : ''}<linearGradient id="f" gradientUnits="userSpaceOnUse" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" spreadMethod="reflect">${stops}${gradientMotion}</linearGradient></defs>`
     + `${bg}<g>${blink}${letters}</g>`
-    + `${floorBand}${footer}</svg>`;
+    + `${floorBand}${footer}<!-- Generated with Pixel Banner: https://github.com/IamAngusU/pixel-banner --></svg>`;
 }
 
 // text-reveal: each letter fades in with a rise + blur, staggered left to right.
