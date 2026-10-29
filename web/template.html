@@ -56,6 +56,16 @@ input[type=range]{--range-progress:50%;appearance:none;-webkit-appearance:none;w
   <section class="control-section">
    <div class="section-head"><span class="section-num">04</span><span class="section-title">MOTION & EDITOR</span><span class="section-note">ANIMATION / INTERFACE</span></div>
    <div class="row"><label for="animation">Animation</label><div class="ctl"><select id="animation"><option value="none">00 / Static</option><option value="wave">01 / Wave</option><option value="shimmer">02 / Shimmer</option><option value="blink">03 / Blink</option><option value="floor">04 / Gradient floor</option><option value="reveal">05 / Letter reveal</option><option value="reveal+shimmer">06 / Reveal then shimmer</option></select></div></div>
+   <details class="row" id="revealAdvanced"><summary class="row-label">Reveal timing</summary><div class="ctl" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%">
+    <label class="explain">Letter duration (s)<input class="full-input" id="revealDuration" type="number" min="0.05" max="3" step="0.05" value="0.7"></label>
+    <label class="explain">Base stagger (s)<input class="full-input" id="revealStagger" type="number" min="0" max="1" step="0.01" value="0.18"></label>
+    <label class="explain">Letter Bézier · x1<input class="full-input" id="revealX1" type="number" min="0" max="1" step="0.01" value="0.22"></label>
+    <label class="explain">y1<input class="full-input" id="revealY1" type="number" min="0" max="1" step="0.01" value="1"></label>
+    <label class="explain">x2<input class="full-input" id="revealX2" type="number" min="0" max="1" step="0.01" value="0.36"></label>
+    <label class="explain">y2<input class="full-input" id="revealY2" type="number" min="0" max="1" step="0.01" value="1"></label>
+    <label class="explain" style="grid-column:1/-1">Letter start rhythm<select class="full-input" id="revealStaggerCurve"><option value="linear">Linear · equal gaps</option><option value="accelerate">Accelerate · gaps shrink</option><option value="decelerate">Decelerate · gaps grow</option></select></label>
+    <p class="explain" style="grid-column:1/-1;margin:0">Bézier controls each letter's motion. Rhythm controls when the next letter starts.</p>
+   </div></details>
    <div class="row"><label for="uiTheme">Editor theme</label><div class="ctl"><select id="uiTheme"><option value="auto">System default</option><option value="dark">Dark terminal</option><option value="light">Light terminal</option></select></div></div>
   </section>
 
@@ -89,6 +99,8 @@ function opts() {
   return { colors, shadow: $('shadow').value, scale: +$('scale').value, glyphWidth: +$('glyphWidth').value, taper: $('taper').checked, depth: +$('depth').value,
     spacing: +$('spacing').value, highlight: $('highlight').value / 100, weight: +$('weight').value,
     animation: $('animation').value, vertical: $('dir').value === 'v', light: $('light').checked,
+    revealDuration: +$('revealDuration').value, revealStagger: +$('revealStagger').value,
+    revealBezier: ['revealX1','revealY1','revealX2','revealY2'].map((id) => { const value = Number($(id).value); return Number.isFinite(value) ? Math.max(0, Math.min(1, value)) : 0; }), revealStaggerCurve: $('revealStaggerCurve').value,
     transparent, bg: $('useBg').checked ? $('bg').value : null };
 }
 
@@ -159,6 +171,8 @@ function applyPreset(name) {
   $('shadow').value = p.shadow; $('scale').value = p.scale; $('scalePx').value = p.scale; $('glyphWidth').value = p.glyphWidth ?? DEFAULTS.glyphWidth; $('taper').checked = !!p.taper; $('depth').value = p.depth; $('spacing').value = p.spacing;
   $('highlight').value = Math.round(p.highlight * 100); $('weight').value = p.weight;
   $('animation').value = p.animation; $('dir').value = p.vertical ? 'v' : 'h';
+  $('revealDuration').value = p.revealDuration ?? DEFAULTS.revealDuration; $('revealStagger').value = p.revealStagger ?? DEFAULTS.revealStagger;
+  const curve = p.revealBezier ?? DEFAULTS.revealBezier; ['revealX1','revealY1','revealX2','revealY2'].forEach((id, i) => { $(id).value = curve[i]; }); $('revealStaggerCurve').value = p.revealStaggerCurve ?? DEFAULTS.revealStaggerCurve;
   $('light').checked = !!p.light;
   $('useBg').checked = !!p.bg;
   if (p.bg) $('bg').value = p.bg;
