@@ -69,7 +69,7 @@ test('svg is responsive: viewBox + preserveAspectRatio, no fixed CSS', () => {
 
 test('animations add the expected elements', () => {
   assert.match(renderSvg('A', { animation: 'wave' }), /animateTransform[^>]*type="translate"/);
-  assert.match(renderSvg('A', { animation: 'shimmer' }), /<animateTransform attributeName="gradientTransform"/);
+  assert.match(renderSvg('A', { animation: 'shimmer' }), /<animate attributeName="x1"/);
   assert.match(renderSvg('A', { animation: 'blink' }), /attributeName="opacity"/);
   assert.ok(!renderSvg('A').includes('<animate'));
 });
@@ -81,7 +81,9 @@ test('gradient faces use shared banner coordinates so shimmer spans the text', (
   const firstX = (path) => Number(path.match(/M([\d.-]+)/)[1]);
   assert.ok(firstX(facePaths[1]) > firstX(facePaths[0]), 'each glyph face is positioned in banner coordinates');
   assert.match(svg, /<linearGradient id="f" gradientUnits="userSpaceOnUse" x1="1" y1="0" x2="\d+" y2="0"/);
-  assert.match(svg, /<animateTransform attributeName="gradientTransform" type="translate" from="0 0" to="22 0" dur="4s" begin="0s" repeatCount="indefinite"\/>/);
+  assert.match(svg, /<animate attributeName="x1" values="1;23" dur="4s" begin="0s" repeatCount="indefinite"\/>/);
+  assert.match(svg, /<animate attributeName="x2" values="12;34" dur="4s" begin="0s" repeatCount="indefinite"\/>/);
+  assert.ok(!svg.includes('attributeName="gradientTransform"'));
 });
 
 test('shimmer moves the selected multicolor gradient across the face', () => {
@@ -92,7 +94,20 @@ test('shimmer moves the selected multicolor gradient across the face', () => {
 
   const afterReveal = renderSvg('HI', { animation: 'reveal+shimmer' });
   assert.equal([...afterReveal.matchAll(/<animate attributeName="opacity" values="0;1"/g)].length, 2);
-  assert.match(afterReveal, /<animateTransform attributeName="gradientTransform"[^>]*dur="4s" begin="0\.88s"/);
+  assert.match(afterReveal, /<animate attributeName="x1"[^>]*dur="4s" begin="0\.88s"/);
+});
+
+test('vertical shimmer animates the gradient endpoints on the y axis', () => {
+  const svg = renderSvg('AB', { animation: 'shimmer', vertical: true, depth: 0, highlight: 0 });
+  assert.match(svg, /<animate attributeName="y1" values="1;15" dur="4s" begin="0s" repeatCount="indefinite"\/>/);
+  assert.match(svg, /<animate attributeName="y2" values="8;22" dur="4s" begin="0s" repeatCount="indefinite"\/>/);
+});
+
+test('floor animation does not animate the text gradient', () => {
+  const svg = renderSvg('HI', { animation: 'floor' });
+  assert.ok(!svg.includes('attributeName="gradientTransform"'));
+  assert.ok(!/animate attributeName="x1"/.test(svg));
+  assert.match(svg, /<animate attributeName="x"/, 'floor bands still move independently');
 });
 
 test('renderer keeps any requested number of gradient stops', () => {
