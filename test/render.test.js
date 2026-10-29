@@ -137,15 +137,37 @@ test('floor animation adds a gradient floor band', () => {
 
 test('reveal animation staggers every letter, including long text', () => {
   const svg = renderSvg('ABCDEFGHIJKLMNOPQRST', { animation: 'reveal' });
-  const fades = [...svg.matchAll(/<animate attributeName="opacity" values="0;1" dur="0\.7s" begin="([\d.]+)s" fill="freeze"\/>/g)];
+  const fades = [...svg.matchAll(/<animate attributeName="opacity" values="0;1"[^>]*dur="0\.7s"[^>]*begin="([\d.]+)s" fill="freeze"\/>/g)];
   const times = fades.map((m) => Number(m[1]));
   assert.equal(times.length, 20, 'all 20 letters get a reveal animation');
   assert.equal(times[0], 0, 'the first letter starts immediately');
   assert.equal(times[1], 0.18, 'the next letter is staggered');
   assert.equal(times.at(-1), 3.42, 'the last letter still gets a valid delay');
   assert.match(svg, /<g opacity="0" transform="translate\(0 3\)" filter="url\(#blur\)">/, 'letters start hidden, raised, and blurred before their delay');
-  assert.ok(!/keyTimes="0;[1-9]/.test(svg), 'seconds are not incorrectly used as normalized keyTimes');
+  assert.match(svg, /keyTimes="0;1"/, 'each easing spline uses normalized keyTimes');
   assert.match(svg, /attributeName="filter" values="url\(#blur\);none"/);
+});
+
+test('reveal supports configurable duration, easing, and accelerating letter starts', () => {
+  const svg = renderSvg('ABCD', {
+    animation: 'reveal',
+    revealDuration: 0.4,
+    revealStagger: 0.2,
+    revealBezier: [0.1, 0.2, 0.8, 0.9],
+    revealStaggerCurve: 'accelerate',
+  });
+  assert.match(svg, /values="0;1" calcMode="spline" keyTimes="0;1" keySplines="0.1 0.2 0.8 0.9" dur="0.4s"/);
+  const times = [...svg.matchAll(/attributeName="opacity" values="0;1"[^>]*begin="([\\d.]+)s"/g)].map((m) => Number(m[1]));
+  assert.equal(times.length, 4);
+  assert.equal(times[0], 0);
+  assert.ok(times[2] - times[1] < times[1] - times[0] || times[1] === 0, 'later letters begin with progressively shorter gaps');
+  assert.ok(times[3] > times[2]);
+});
+
+test('reveal falls back to safe easing values for invalid custom curves', () => {
+  const svg = renderSvg('AB', { animation: 'reveal', revealBezier: ['bad', -3, 2, 0.5] });
+  assert.ok(!svg.includes('NaN') && !svg.includes('undefined'));
+  assert.match(svg, /keySplines="0.22 0 1 0.5"/);
 });
 
 test('footer renders powered-by credit with repo link', () => {

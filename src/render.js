@@ -20,6 +20,10 @@ export const DEFAULTS = {
   light: false,        // true = light-mode look (bright shadow, dark shine, framed for white pages)
   padding: 1,          // margin in cells
   footer: false,       // append a "powered by" pixel credit under the banner
+  revealDuration: 0.7, // seconds for each letter's reveal
+  revealStagger: 0.18,  // seconds between letter starts before curve shaping
+  revealBezier: [0.22, 1, 0.36, 1], // cubic-bezier easing for each letter
+  revealStaggerCurve: 'linear', // linear | accelerate (gaps shrink) | decelerate (gaps grow)
 };
 
 const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -96,7 +100,9 @@ export function renderSvg(text, opts = {}) {
   const stops = colors.map((c, i) => `<stop offset="${(i / (colors.length - 1)).toFixed(3)}" stop-color="${c}"/>`).join('');
   // Move the selected color gradient across the letters. When combined with
   // reveal, begin the color sweep after the last glyph has appeared.
-  const motionBegin = reveal ? `${((n - 1) * 0.18 + 0.7).toFixed(2)}s` : '0s';
+  const revealDuration = Math.max(0.05, Number(o.revealDuration) || DEFAULTS.revealDuration);
+  const revealStagger = Math.max(0, Number(o.revealStagger) || 0);
+  const motionBegin = reveal ? `${((n - 1) * revealStagger + revealDuration).toFixed(2)}s` : '0s';
   // Animate gradient endpoints directly for reliable SVG animation in WebKit and other renderers.
   // Moving both endpoints by two gradient lengths preserves the spreadMethod="reflect" cycle.
   const gradientMotion = shimmerEnabled
@@ -130,7 +136,7 @@ export function renderSvg(text, opts = {}) {
     const detailLayer = details ? `<g transform="translate(${ox(i)} ${glyphY}) scale(${sx.toFixed(4)} 1)">${details}</g>` : '';
     const waveFx = wave ? `<animateTransform attributeName="transform" type="translate" values="0 0;0 -1;0 0" dur="1.2s" begin="${(i * 0.12).toFixed(2)}s" repeatCount="indefinite"/>` : '';
     const revealBase = reveal ? ' opacity="0" transform="translate(0 3)" filter="url(#blur)"' : '';
-    return `<g${revealBase}>${shadowLayer}${facePath}${detailLayer}${waveFx}${reveal ? revealFx(i) : ''}</g>`;
+    return `<g${revealBase}>${shadowLayer}${facePath}${detailLayer}${waveFx}${reveal ? revealFx(i, n, o) : ''}</g>`;
   }).join('');
 
   const blink = hasAnimation('blink') ? '<animate attributeName="opacity" values="1;.35;1" dur="1.6s" repeatCount="indefinite"/>' : '';
@@ -151,11 +157,40 @@ export function renderSvg(text, opts = {}) {
 // text-reveal: each letter fades in with a rise + blur, staggered left to right.
 // `begin` is a time offset in seconds; keyTimes are normalized fractions and must
 // stay within 0..1. Mixing the two was why longer words stopped revealing.
-function revealFx(i) {
-  const delay = (i * 0.18).toFixed(2);
-  return `<animate attributeName="opacity" values="0;1" dur="0.7s" begin="${delay}s" fill="freeze"/>`
-    + `<animateTransform attributeName="transform" type="translate" values="0 3;0 0" dur="0.7s" begin="${delay}s" fill="freeze"/>`
-    + `<animate attributeName="filter" values="url(#blur);none" dur="0.7s" begin="${delay}s" fill="freeze"/>`;
+function revealFx(i, count, o) {
+  const duration = Math.max(0.05, Number(o.revealDuration) || DEFAULTS.revealDuration);
+  const stagger = Math.max(0, Number(o.revealStagger) || 0);
+  const curveName = o.revealStaggerCurve || 'linear';
+  const bezier = Array.isArray(o.revealBezier) && o.revealBezier.length === 4
+    ? o.revealBezier.map((v, index) => {
+      const number = Number(v);
+      return Number.isFinite(number) ? Math.max(0, Math.min(1, number)) : DEFAULTS.revealBezier[index];
+    })
+    : DEFAULTS.revealBezier;
+  const staggerCurves = {
+    linear: [0, 0, 1, 1],
+    accelerate: [0, 0, 0.58, 1],
+    decelerate: [0.42, 0, 1, 1],
+  };
+  const timingCurve = staggerCurves[curveName] || staggerCurves.linear;
+  const progress = count <= 1 ? 0 : i / (count - 1);
+  const delay = (stagger * Math.max(0, count - 1) * cubicBezierY(progress, timingCurve)).toFixed(3);
+  const spline = bezier.join(' ');
+  return `<animate attributeName="opacity" values="0;1" calcMode="spline" keyTimes="0;1" keySplines="${spline}" dur="${duration}s" begin="${delay}s" fill="freeze"/>`
+    + `<animateTransform attributeName="transform" type="translate" values="0 3;0 0" calcMode="spline" keyTimes="0;1" keySplines="${spline}" dur="${duration}s" begin="${delay}s" fill="freeze"/>`
+    + `<animate attributeName="filter" values="url(#blur);none" calcMode="spline" keyTimes="0;1" keySplines="${spline}" dur="${duration}s" begin="${delay}s" fill="freeze"/>`;
+}
+
+function cubicBezierY(x, points) {
+  const [x1, y1, x2, y2] = points;
+  const component = (t, a, b) => 3 * (1 - t) * (1 - t) * t * a + 3 * (1 - t) * t * t * b + t * t * t;
+  let low = 0, high = 1, t = x;
+  for (let step = 0; step < 18; step++) {
+    t = (low + high) / 2;
+    if (component(t, x1, x2) < x) low = t;
+    else high = t;
+  }
+  return component(t, y1, y2);
 }
 
 function blurFilter() {
