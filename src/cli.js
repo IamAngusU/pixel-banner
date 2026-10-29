@@ -29,8 +29,8 @@ if (v.help || !positionals.length) {
   --taper        (jedes folgende Zeichen bis zu 28% schmaler)
   --dark     (Lightmode aus, z. B. um ein light-Preset zu überschreiben)
   -a none|wave|shimmer|blink|floor|reveal|reveal+shimmer
-  Terminal:  --ansi   (eine statische ANSI-Ansicht ausgeben)
-             --tui    (animierte Live-Ansicht im Terminal, Strg-C beendet)`);
+  Terminal:  --ansi   (statisches Pixelbild mit 24-Bit-Farben ausgeben)
+             --tui    (animiertes Pixelbild im Terminal, Strg-C beendet)`);
   process.exit(v.help ? 0 : 1);
 }
 if (v.preset && !PRESETS[v.preset]) { console.error(`Unknown preset: ${v.preset}`); process.exit(1); }
@@ -56,7 +56,8 @@ if (v.tui || v.ansi) {
     animate(text, opts);
   } else {
     const frame = buildFrame(text, opts);
-    process.stdout.write(frameToString(frame, 0) + '\n');
+    const finalRevealTime = frame.animations.has('reveal') ? (frame.n - 1) * 0.18 + 0.7 : 0;
+    process.stdout.write(frameToString(frame, finalRevealTime) + '\n');
   }
 } else {
   const svg = renderSvg(text, opts);

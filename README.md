@@ -45,10 +45,16 @@ Every generated SVG also includes a hidden source comment linking back to this r
 
 ## Terminal
 
-Print your own colorful pixel banner directly in the terminal (Node.js 18+):
+Print the repo banner directly in the terminal with its pixel font and neon colors (Node.js 18+):
 
 ```sh
-npx --yes github:IamAngusU/pixel-banner "HELLO" --ansi
+npx --yes github:IamAngusU/pixel-banner "PIXEL-BANNER" --preset neon --ansi
+```
+
+Play its reveal and color shimmer in the terminal; stop with `Ctrl+C`:
+
+```sh
+npx --yes github:IamAngusU/pixel-banner "PIXEL-BANNER" --preset neon --animation reveal+shimmer --tui
 ```
 
 ## Icon Marquee

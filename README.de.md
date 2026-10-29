@@ -45,10 +45,16 @@ Jede generierte SVG enthält außerdem einen unsichtbaren Quelltext-Kommentar mi
 
 ## Terminal
 
-Gib dein eigenes farbiges Pixel-Banner direkt im Terminal aus (Node.js 18+):
+Gib das Repo-Banner mit Pixel-Schrift und Neonfarben direkt im Terminal aus (Node.js 18+):
 
 ```sh
-npx --yes github:IamAngusU/pixel-banner "HALLO" --ansi
+npx --yes github:IamAngusU/pixel-banner "PIXEL-BANNER" --preset neon --ansi
+```
+
+Reveal und Farb-Schimmer live im Terminal abspielen, mit `Ctrl+C` beenden:
+
+```sh
+npx --yes github:IamAngusU/pixel-banner "PIXEL-BANNER" --preset neon --animation reveal+shimmer --tui
 ```
 
 ## Icon Marquee
