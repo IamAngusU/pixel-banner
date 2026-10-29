@@ -144,7 +144,7 @@ test('reveal animation staggers every letter, including long text', () => {
   assert.equal(times[1], 0.18, 'the next letter is staggered');
   assert.equal(times.at(-1), 3.42, 'the last letter still gets a valid delay');
   assert.match(svg, /<g opacity="0" transform="translate\(0 3\)" filter="url\(#blur\)">/, 'letters start hidden, raised, and blurred before their delay');
-  assert.ok(!/keyTimes="0;[1-9]/.test(svg), 'seconds are not incorrectly used as normalized keyTimes');
+  assert.match(svg, /keyTimes="0;1"/, 'each easing spline uses normalized keyTimes');
   assert.match(svg, /attributeName="filter" values="url\(#blur\);none"/);
 });
 
