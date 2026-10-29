@@ -137,7 +137,7 @@ test('floor animation adds a gradient floor band', () => {
 
 test('reveal animation staggers every letter, including long text', () => {
   const svg = renderSvg('ABCDEFGHIJKLMNOPQRST', { animation: 'reveal' });
-  const fades = [...svg.matchAll(/<animate attributeName="opacity" values="0;1" dur="0\.7s" begin="([\d.]+)s" fill="freeze"\/>/g)];
+  const fades = [...svg.matchAll(/<animate attributeName="opacity" values="0;1"[^>]*dur="0\.7s"[^>]*begin="([\d.]+)s" fill="freeze"\/>/g)];
   const times = fades.map((m) => Number(m[1]));
   assert.equal(times.length, 20, 'all 20 letters get a reveal animation');
   assert.equal(times[0], 0, 'the first letter starts immediately');
