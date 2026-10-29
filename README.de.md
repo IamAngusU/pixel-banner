@@ -57,6 +57,13 @@ Reveal und Farb-Schimmer live im Terminal abspielen, mit `Ctrl+C` beenden:
 npx --yes github:IamAngusU/pixel-banner "PIXEL-BANNER" --preset neon --animation reveal+shimmer --tui
 ```
 
+Bei häufiger Nutzung einmal installieren und danach `pixel-banner` direkt starten:
+
+```sh
+npm install --global github:IamAngusU/pixel-banner
+pixel-banner "PIXEL-BANNER" --preset neon --animation reveal+shimmer --tui
+```
+
 ## Icon Marquee
 
 <p align="center"><a href="https://github.com/IamAngusU/icon-marquee"><img src="https://angusu.de/icon-marquee/api/IamAngusU/pixel-banner.svg?include=javascript,nodejs,npm,github&height=56&gap=14&width=680&speed=40&edgeFade=24" alt="JavaScript-, Node.js-, npm- und GitHub-Icons"></a></p>

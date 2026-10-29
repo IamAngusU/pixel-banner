@@ -57,6 +57,13 @@ Play its reveal and color shimmer in the terminal; stop with `Ctrl+C`:
 npx --yes github:IamAngusU/pixel-banner "PIXEL-BANNER" --preset neon --animation reveal+shimmer --tui
 ```
 
+If you use it often, install it once and run `pixel-banner` directly:
+
+```sh
+npm install --global github:IamAngusU/pixel-banner
+pixel-banner "PIXEL-BANNER" --preset neon --animation reveal+shimmer --tui
+```
+
 ## Icon Marquee
 
 <p align="center"><a href="https://github.com/IamAngusU/icon-marquee"><img src="https://angusu.de/icon-marquee/api/IamAngusU/pixel-banner.svg?include=javascript,nodejs,npm,github&height=56&gap=14&width=680&speed=40&edgeFade=24" alt="JavaScript, Node.js, npm and GitHub icons"></a></p>
