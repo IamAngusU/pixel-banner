@@ -94,29 +94,12 @@ export function renderSvg(text, opts = {}) {
   const colors = o.colors.length > 1 ? o.colors : [o.colors[0], o.colors[0]];
 
   const stops = colors.map((c, i) => `<stop offset="${(i / (colors.length - 1)).toFixed(3)}" stop-color="${c}"/>`).join('');
-  // Animate gradient coordinates directly. GitHub renders regular SVG <animate>
-  // (used by reveal) more reliably than <animateTransform> on gradientTransform.
-  // When reveal is enabled, start the shimmer after the last glyph has appeared.
+  // Move the selected color gradient across the letters. When combined with
+  // reveal, begin the color sweep after the last glyph has appeared.
   const motionBegin = reveal ? `${((n - 1) * 0.18 + 0.7).toFixed(2)}s` : '0s';
   const gradientMotion = shimmerEnabled || floor
-    ? o.vertical
-      ? `<animate attributeName="y1" from="${y1}" to="${y1 + 2 * len}" dur="4s" begin="${motionBegin}" repeatCount="indefinite"/><animate attributeName="y2" from="${y2}" to="${y2 + 2 * len}" dur="4s" begin="${motionBegin}" repeatCount="indefinite"/>`
-      : `<animate attributeName="x1" from="${x1}" to="${x1 + 2 * len}" dur="4s" begin="${motionBegin}" repeatCount="indefinite"/><animate attributeName="x2" from="${x2}" to="${x2 + 2 * len}" dur="4s" begin="${motionBegin}" repeatCount="indefinite"/>`
+    ? `<animateTransform attributeName="gradientTransform" type="translate" from="0 0" to="${o.vertical ? `0 ${2 * len}` : `${2 * len} 0`}" dur="4s" begin="${motionBegin}" repeatCount="indefinite"/>`
     : '';
-  // A narrow white band makes shimmer visible even when the base colors are close.
-  const bandWidth = Math.max(3, Math.min(12, len * 0.18));
-  const bandOffset = o.vertical ? glyphY : o.padding;
-  const bandX2 = o.vertical ? 0 : bandWidth;
-  const bandY2 = o.vertical ? bandWidth : 0;
-  const bandStart = bandOffset - bandWidth;
-  const bandEnd = bandOffset + len;
-  const bandMotion = o.vertical
-    ? `<animate attributeName="y1" from="${bandStart}" to="${bandEnd}" dur="2.6s" begin="${motionBegin}" repeatCount="indefinite"/><animate attributeName="y2" from="${bandStart + bandWidth}" to="${bandEnd + bandWidth}" dur="2.6s" begin="${motionBegin}" repeatCount="indefinite"/>`
-    : `<animate attributeName="x1" from="${bandStart}" to="${bandEnd}" dur="2.6s" begin="${motionBegin}" repeatCount="indefinite"/><animate attributeName="x2" from="${bandStart + bandWidth}" to="${bandEnd + bandWidth}" dur="2.6s" begin="${motionBegin}" repeatCount="indefinite"/>`;
-  const shimmerBand = shimmerEnabled
-    ? `<linearGradient id="shine" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="${bandX2}" y2="${bandY2}" spreadMethod="pad">`
-      + `<stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="0.38" stop-color="#fff" stop-opacity="0"/><stop offset="0.5" stop-color="#fff" stop-opacity="0.85"/><stop offset="0.62" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>`
-      + `${bandMotion}</linearGradient>` : '';
 
   const ox = (i) => o.padding + glyphWidths.slice(0, i).reduce((sum, width) => sum + width, 0) + i * o.spacing;
   const defs = grids.map((g, i) => `<path id="g${i}" d="${runs(g, 0, face)}"/>`).join('');
@@ -138,14 +121,13 @@ export function renderSvg(text, opts = {}) {
     }
     const shadowLayer = `<g transform="translate(${ox(i)} ${glyphY}) scale(${sx.toFixed(4)} 1)">${shadow}</g>`;
     const facePath = `<path d="${runs(g, ox(i), face, sx, glyphY)}" fill="url(#f)"/>`;
-    const shimmerFace = shimmerEnabled ? `<path d="${runs(g, ox(i), face, sx, glyphY)}" fill="url(#shine)"/>` : '';
     let details = '';
     if (light) details += `<path d="${runs(g, 0, face)}" fill="none" stroke="${mix(o.colors[0], '#000000', 0.5)}" stroke-width="0.5" stroke-opacity="0.35"/>`;
     if (o.highlight > 0) details += `<path d="${runs(g, 0, edge)}" fill="${shine}" fill-opacity="${shineOpacity}"/>`;
     const detailLayer = details ? `<g transform="translate(${ox(i)} ${glyphY}) scale(${sx.toFixed(4)} 1)">${details}</g>` : '';
     const waveFx = wave ? `<animateTransform attributeName="transform" type="translate" values="0 0;0 -1;0 0" dur="1.2s" begin="${(i * 0.12).toFixed(2)}s" repeatCount="indefinite"/>` : '';
     const revealBase = reveal ? ' opacity="0" transform="translate(0 3)" filter="url(#blur)"' : '';
-    return `<g${revealBase}>${shadowLayer}${facePath}${detailLayer}${shimmerFace}${waveFx}${reveal ? revealFx(i) : ''}</g>`;
+    return `<g${revealBase}>${shadowLayer}${facePath}${detailLayer}${waveFx}${reveal ? revealFx(i) : ''}</g>`;
   }).join('');
 
   const blink = hasAnimation('blink') ? '<animate attributeName="opacity" values="1;.35;1" dur="1.6s" repeatCount="indefinite"/>' : '';
@@ -158,7 +140,7 @@ export function renderSvg(text, opts = {}) {
 
   // aria-label + responsive: width/height only hint the intrinsic size, CSS max-width keeps it fluid
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${Htotal}" width="${W * o.scale}" height="${Htotal * o.scale}" preserveAspectRatio="xMidYMid meet" shape-rendering="crispEdges" role="img" aria-label="${esc(String(text))}">`
-    + `<title>${esc(String(text))}</title><defs>${defs}${reveal ? blurFilter() : ''}<linearGradient id="f" gradientUnits="userSpaceOnUse" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" spreadMethod="reflect">${stops}${gradientMotion}</linearGradient>${shimmerBand}</defs>`
+    + `<title>${esc(String(text))}</title><defs>${defs}${reveal ? blurFilter() : ''}<linearGradient id="f" gradientUnits="userSpaceOnUse" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" spreadMethod="reflect">${stops}${gradientMotion}</linearGradient></defs>`
     + `${bg}<g>${blink}${letters}</g>`
     + `${floorBand}${footer}</svg>`;
 }
