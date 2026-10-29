@@ -89,7 +89,7 @@ test('gradient faces use shared banner coordinates so shimmer spans the text', (
 test('shimmer moves the selected multicolor gradient across the face', () => {
   const svg = renderSvg('AB', { animation: 'shimmer', depth: 0, highlight: 0 });
   assert.match(svg, /<stop offset="0\.000" stop-color="#5B6CFF"\/><stop offset="1\.000" stop-color="#A66BFF"\/>/);
-  assert.match(svg, /<animateTransform attributeName="gradientTransform" type="translate" from="0 0" to="22 0" dur="4s" begin="0s" repeatCount="indefinite"\/>/);
+  assert.match(svg, /<animate attributeName="x1" values="1;23" dur="4s" begin="0s" repeatCount="indefinite"\/>/);
   assert.ok(!svg.includes('id="shine"'), 'no white overlay band replaces the selected gradient');
 
   const afterReveal = renderSvg('HI', { animation: 'reveal+shimmer' });
