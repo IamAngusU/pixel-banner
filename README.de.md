@@ -12,7 +12,7 @@
   <a href="LICENSE"><img src="https://img.shields.io/github/license/IamAngusU/pixel-banner?style=flat-square" alt="MIT-Lizenz"></a>
 </p>
 
-<p align="center"><a href="#galerie">Galerie</a> · <a href="#schnellstart">Schnellstart</a> · <a href="#terminal">Terminal</a> · <a href="#lizenz">Lizenz</a></p>
+<p align="center"><a href="#galerie">Galerie</a> · <a href="#schnellstart">Schnellstart</a> · <a href="#cli-optionen">CLI-Optionen</a> · <a href="#terminal">Terminal</a> · <a href="#lizenz">Lizenz</a></p>
 
 ## Galerie
 
@@ -40,6 +40,57 @@ Mit einer oder mehreren kommagetrennten Farben bestimmst du die Anzahl der Verla
 
 Jede generierte SVG enthält einen unsichtbaren Quelltext-Kommentar mit dem Link zu diesem Repository.
 
+## CLI-Optionen
+
+`pixel-banner --help` zeigt eine Kurzfassung. Hier findest du alle Optionen; die Standardwerte sind **fett** markiert und gelten, sofern ein Preset sie nicht überschreibt.
+
+### Text, Ausgabe und Presets
+
+| Flag | Funktion |
+|---|---|
+| `TEXT` | Zu rendernder Text. Nicht unterstützte Zeichen werden als `?` dargestellt. |
+| `-o, --out DATEI` | SVG in eine Datei schreiben. Ohne diese Option wird die SVG auf stdout ausgegeben. |
+| `-p, --preset NAME` | Einen eingebauten Stil laden: `aiphone`, `neon`, `fire`, `mono`, `floor`, `reveal`, `light`, `light-sun`, `light-mint` oder `light-ink`. Andere Flags können Preset-Werte überschreiben. |
+| `-h, --help` | Kurzhilfe anzeigen. |
+
+### Form und Tiefe
+
+| Flag | Standard | Funktion |
+|---|---:|---|
+| `--scale N` | **8** | Ausgabepixel pro Zelle der Pixel-Schrift. Ein größerer Wert vergrößert die SVG, ohne das Design zu ändern. |
+| `--glyph-width N` | **100** | Zeichenbreite in Prozent: `60` ist schmal, `140` ist breit. |
+| `--weight N` | **1** | `1` nutzt die normale dünne Schrift, `2` macht die Zeichen kräftiger. |
+| `--depth N` | **3** | Anzahl diagonaler 3D-Tiefenstufen in Pixel-Schriftzellen. `0` ergibt flache Schrift; höhere Werte erzeugen mehr Tiefe. Der Web-Regler reicht von `0–8`; in der CLI sind auch größere nicht-negative Ganzzahlen möglich. |
+| `--spacing N` | **1** | Abstand zwischen Buchstaben in Zellen. `0` verbindet sie, höhere Werte vergrößern den Abstand. |
+| `--padding N` | **1** | Freier Rand um das Banner in Zellen. |
+| `--taper` | aus | Verengt die Zeichen schrittweise zum Ende hin um bis zu 28 Prozent. |
+
+### Farben, Hintergrund und Animation
+
+| Flag | Standard | Funktion |
+|---|---:|---|
+| `--colors "HEX,HEX,..."` | **`#5B6CFF,#A66BFF`** | Setzt eine oder mehrere Verlauf-Farben. Weitere kommagetrennte Farben fügen Verlaufstufen hinzu; eine Farbe ergibt eine einfarbige Füllung. |
+| `--vertical` | aus | Lässt den Farbverlauf von oben nach unten statt von links nach rechts laufen. |
+| `--shadow HEX` | **`#2B2A6B`** | Farbe der 3D-Tiefenstufen. |
+| `--highlight N` | **0.25** | Stärke der hellen Oberkante von `0` (aus) bis `1` (maximal). |
+| `--bg HEX` | keiner | Füllt den Hintergrund mit einer Farbe. |
+| `--transparent` | aus | Hält den SVG-Hintergrund transparent, auch wenn `--bg` gesetzt ist. |
+| `--light` | aus | Passt den Kontrast für helle Seiten an und macht den Hintergrund transparent, sofern kein `--bg` angegeben ist. |
+| `--dark` | — | Deaktiviert den Hellseiten-Stil, zum Beispiel zum Überschreiben eines `light-*`-Presets. |
+| `--animation NAME` | **`none`** | Wählt `none`, `wave`, `shimmer`, `blink`, `floor` oder `reveal`. Effekte lassen sich mit `+` kombinieren, zum Beispiel `reveal+shimmer`. |
+| `--footer` | aus | Fügt unter dem Banner einen sichtbaren „powered by“-Hinweis mit Repository-Link hinzu. |
+
+### Terminal-Ausgabe
+
+| Flag | Funktion |
+|---|---|
+| `--ansi` | Gibt ein statisches Pixelbild mit 24-Bit-Farben im Terminal aus. |
+| `--tui` | Spielt Animationen im Terminal ab. Mit Strg+C beenden. |
+| `--live` | Öffnet einen interaktiven Editor: Tippen, Cursor bewegen oder löschen und die Vorschau sofort sehen. Enter beendet, Esc oder Strg+C bricht ab. Mit `-o DATEI` wird die fertige SVG gespeichert. |
+| `--width N` | Legt die Zeilenbreite für `--ansi`, `--tui` oder `--live` fest. Standardmäßig wird die aktuelle Terminalbreite genutzt. |
+
+Auch der Web-Generator aktualisiert die SVG-Vorschau während der Eingabe und bei Änderungen an den Reglern. Der Tiefenregler reicht von `0` (flach) bis `8` (starker 3D-Effekt).
+
 ## Terminal
 
 Zeige das Pixel-Art-Banner farbig im Terminal an:
@@ -53,6 +104,14 @@ Spiele Reveal und Farb-Schimmer live ab:
 ```sh
 npx --yes @iamangusu/pixel-banner "PIXEL-BANNER" --preset neon --animation reveal+shimmer --tui
 ```
+
+Gib den Text direkt in eine interaktive Terminal-Vorschau ein:
+
+```sh
+npx --yes @iamangusu/pixel-banner --live --preset neon --animation shimmer
+```
+
+Lange Terminal-Banner werden automatisch an die Fensterbreite angepasst. Mit `--width 100` kannst du die Breite selbst festlegen.
 
 Bei häufiger Nutzung installierst du es einmal:
 
