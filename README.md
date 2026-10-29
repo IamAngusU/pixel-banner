@@ -60,7 +60,7 @@ npx --yes github:IamAngusU/pixel-banner "PIXEL-BANNER" --preset neon --animation
 If you use it often, install it once and run `pixel-banner` directly:
 
 ```sh
-npm install --global github:IamAngusU/pixel-banner
+npm install --global https://codeload.github.com/IamAngusU/pixel-banner/tar.gz/refs/heads/main
 pixel-banner "PIXEL-BANNER" --preset neon --animation reveal+shimmer --tui
 ```
 
