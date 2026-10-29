@@ -148,6 +148,28 @@ test('reveal animation staggers every letter, including long text', () => {
   assert.match(svg, /attributeName="filter" values="url\(#blur\);none"/);
 });
 
+test('reveal supports configurable duration, easing, and accelerating letter starts', () => {
+  const svg = renderSvg('ABCD', {
+    animation: 'reveal',
+    revealDuration: 0.4,
+    revealStagger: 0.2,
+    revealBezier: [0.1, 0.2, 0.8, 0.9],
+    revealStaggerCurve: 'accelerate',
+  });
+  assert.match(svg, /values="0;1" calcMode="spline" keyTimes="0;1" keySplines="0.1 0.2 0.8 0.9" dur="0.4s"/);
+  const times = [...svg.matchAll(/attributeName="opacity" values="0;1"[^>]*begin="([\\d.]+)s"/g)].map((m) => Number(m[1]));
+  assert.equal(times.length, 4);
+  assert.equal(times[0], 0);
+  assert.ok(times[2] - times[1] < times[1] - times[0] || times[1] === 0, 'later letters begin with progressively shorter gaps');
+  assert.ok(times[3] > times[2]);
+});
+
+test('reveal falls back to safe easing values for invalid custom curves', () => {
+  const svg = renderSvg('AB', { animation: 'reveal', revealBezier: ['bad', -3, 2, 0.5] });
+  assert.ok(!svg.includes('NaN') && !svg.includes('undefined'));
+  assert.match(svg, /keySplines="0.22 0 1 0.5"/);
+});
+
 test('footer renders powered-by credit with repo link', () => {
   const svg = renderSvg('HI', { footer: true });
   assert.ok(svg.includes('github.com/iamangusu/pixel-banner'), 'href present');
