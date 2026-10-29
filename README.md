@@ -91,7 +91,7 @@ Run `pixel-banner --help` for the short version. The full reference is below; de
 | `--live` | Open the interactive live studio. Type your text, then press Tab to edit presets, animation, colors, depth, size, spacing, shadow, background, and other output options with an instant preview. Press Enter to finish from text mode, Ctrl+S from settings, or Ctrl+C to cancel. Add `-o FILE` to choose an SVG output path. |
 | `--width N` | Set terminal wrapping width for `--ansi`, `--tui`, or `--live`. By default the current terminal width is used. |
 
-The web generator also updates its SVG preview as you type and as you change controls. Its depth slider ranges from `0` (flat) to `8` (deep extrusion).
+The web generator also updates its SVG preview as you type and as you change controls. Its depth slider ranges from `0` (flat) to `8` (deep extrusion). Reveal timing is configurable in the renderer with `revealDuration`, `revealStagger`, `revealBezier: [x1, y1, x2, y2]`, and `revealStaggerCurve: 'linear' | 'accelerate' | 'decelerate'`. The easing Bézier controls each letter's fade/rise; the stagger curve shapes when each next letter starts. `accelerate` compresses the gaps toward the end, so the word reveals progressively faster.
 
 ## Terminal
 
