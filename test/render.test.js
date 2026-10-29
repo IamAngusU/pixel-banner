@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { renderSvg, PRESETS, GLYPHS, GLYPH_H } from '../src/index.js';
+import { renderSvg, PRESETS, GLYPHS, GLYPH_H, mapTextToGlyphs } from '../src/index.js';
 
 test('renders a valid, scalable svg', () => {
   const svg = renderSvg('HI');
@@ -15,10 +15,24 @@ test('scale changes the output size, not the viewBox', () => {
   assert.equal(2 * +a.match(/ width="(\d+)"/)[1], +b.match(/ width="(\d+)"/)[1]);
 });
 
-test('empty text throws, unknown characters fall back to "?"', () => {
+test('empty text throws, unsupported characters fall back to "?"', () => {
   assert.throws(() => renderSvg(''));
   const glyph = (s) => s.match(/<path id="g0" d="[^"]*"/)[0];
-  assert.equal(glyph(renderSvg('@')), glyph(renderSvg('?')));
+  assert.equal(glyph(renderSvg('🙂')), glyph(renderSvg('?')));
+});
+
+test('every printable ASCII keyboard character has a glyph', () => {
+  for (let code = 32; code <= 126; code++) {
+    const char = String.fromCharCode(code);
+    assert.ok(Object.hasOwn(GLYPHS, char.toUpperCase()), `missing glyph for ${JSON.stringify(char)}`);
+    assert.equal(mapTextToGlyphs(char).length, 1, `unexpected expansion for ${JSON.stringify(char)}`);
+  }
+});
+
+test('common German and accented Latin keyboard input is handled', () => {
+  assert.deepEqual(mapTextToGlyphs('äöüßÄÖÜẞ'), ['A', 'O', 'U', 'S', 'S', 'A', 'O', 'U', 'S', 'S']);
+  assert.deepEqual(mapTextToGlyphs('éñøæœ'), ['E', 'N', 'O', 'A', 'E', 'O', 'E']);
+  assert.ok(GLYPHS['§'] && GLYPHS['€'] && GLYPHS['°'] && GLYPHS['²'] && GLYPHS['³']);
 });
 
 // --- light mode & transparency -------------------------------------------

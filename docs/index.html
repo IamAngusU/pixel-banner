@@ -73,7 +73,7 @@ input[type=range]{--range-progress:50%;appearance:none;-webkit-appearance:none;w
 </main>
 <script>
 const PixelBanner = (() => {
-// 5x7 pixel font. Each row is 5 bits (MSB on the left), written in hex. Add new characters here.
+// 5x7 pixel font. Each row is 5 bits (MSB on the left), written in hex.
 const GLYPH_W = 5;
 const GLYPH_H = 7;
 const raw = {
@@ -91,14 +91,44 @@ const raw = {
   6: '06 08 10 1E 11 11 0E', 7: '1F 01 02 04 08 08 08', 8: '0E 11 11 0E 11 11 0E',
   9: '0E 11 11 0F 01 02 0C',
   ' ': '00 00 00 00 00 00 00', '-': '00 00 00 1F 00 00 00', '_': '00 00 00 00 00 00 1F',
-  '.': '00 00 00 00 00 0C 0C', ':': '00 0C 0C 00 0C 0C 00', '!': '04 04 04 04 04 00 04',
-  '?': '0E 11 01 02 04 00 04', '+': '00 04 04 1F 04 04 00', '/': '01 01 02 04 08 10 10',
+  '.': '00 00 00 00 00 0C 0C', ',': '00 00 00 00 00 0C 08', ':': '00 0C 0C 00 0C 0C 00', '!': '04 04 04 04 04 00 04',
+  '?': '0E 11 01 02 04 00 04', '+': '00 04 04 1F 04 04 00', '/': '01 01 02 04 08 10 10', '\\': '10 10 08 04 02 01 01',
+  '"': '0A 0A 0A 00 00 00 00', '#': '0A 0A 1F 0A 1F 0A 0A', '$': '04 0F 14 0E 05 1E 04',
+  '%': '18 19 02 04 08 13 03', '&': '0C 12 14 08 15 12 0D', "'": '04 04 08 00 00 00 00',
+  '*': '00 15 0E 1F 0E 15 00', ';': '00 0C 0C 00 0C 08 10', '=': '00 1F 00 1F 00 00 00',
+  '@': '0E 11 17 15 17 10 0E', '[': '0E 08 08 08 08 08 0E', ']': '0E 02 02 02 02 02 0E',
+  '^': '04 0A 11 00 00 00 00', '`': '08 04 00 00 00 00 00', '{': '02 04 04 08 04 04 02',
+  '|': '04 04 04 04 04 04 04', '}': '08 04 04 02 04 04 08', '~': '00 00 09 16 00 00 00',
+  '§': '0E 10 0E 11 0E 01 0E', '€': '0E 10 1C 10 1C 10 0E', '°': '0C 12 12 0C 00 00 00',
+  '¹': '04 0C 04 04 04 0E 00', '²': '0E 11 02 04 08 1F 00', '³': '1E 02 04 02 11 0E 00',
   '(': '02 04 08 08 08 04 02', ')': '08 04 02 02 02 04 08',
   '<': '02 04 08 10 08 04 02', '>': '08 04 02 01 02 04 08',
 };
 const GLYPHS = Object.fromEntries(
   Object.entries(raw).map(([k, v]) => [k, v.split(' ').map((h) => parseInt(h, 16))]),
 );
+
+const transliterations = {
+  'ẞ': 'SS', 'Æ': 'AE', 'Œ': 'OE', 'Ø': 'O', 'Ð': 'D', 'Þ': 'TH', 'Ł': 'L', 'Đ': 'D', 'Ŋ': 'N', 'Ħ': 'H',
+  '£': 'L', '¥': 'Y', 'µ': 'M', 'Μ': 'M',
+};
+
+// Keep the pixel alphabet compact while accepting accented Latin input. The
+// base glyph is used for accents; symbols with their own glyph stay distinct.
+function mapTextToGlyphs(text) {
+  const chars = [];
+  for (const source of String(text)) {
+    const upper = source.toUpperCase();
+    if (GLYPHS[upper]) {
+      chars.push(upper);
+      continue;
+    }
+    const mapped = transliterations[upper] ?? transliterations[source];
+    const normalized = mapped ?? upper.normalize('NFD').replace(/\p{M}/gu, '');
+    for (const char of normalized) chars.push(GLYPHS[char] ? char : '?');
+  }
+  return chars;
+}
 
 // Presets are partial overrides of DEFAULTS (see render.js). Add new looks here.
 const PRESETS = {
@@ -185,7 +215,7 @@ function renderSvg(text, opts = {}) {
   const animations = new Set((Array.isArray(o.animation) ? o.animation : String(o.animation || 'none').split('+'))
     .map((name) => String(name).trim()).filter(Boolean));
   const hasAnimation = (name) => animations.has(name);
-  const chars = [...String(text).toUpperCase()];
+  const chars = mapTextToGlyphs(text);
   if (!chars.length) throw new Error('Text is empty');
 
   const grids = chars.map((c) => {
@@ -302,7 +332,7 @@ function footerFx(o, W, H) {
   const url = 'GITHUB.COM/IAMANGUSU/PIXEL-BANNER';
   const gh2 = GLYPH_H + 1;        // 1 blank row between lines
   const line = (s) => {
-    const grids = [...s].map((c) => toGrid(GLYPHS[c] ?? GLYPHS['?']));
+    const grids = mapTextToGlyphs(s).map((c) => toGrid(GLYPHS[c] ?? GLYPHS['?']));
     const n = grids.length, gw = grids[0][0].length, sp = 2;
     const w = n * gw + (n - 1) * sp;
     const ox = (i) => i * (gw + sp);

@@ -40,6 +40,8 @@ Use one or more comma-separated colors to choose the number of gradient stops. T
 
 Every generated SVG includes a hidden source comment linking to this repository.
 
+The pixel font covers every printable ASCII keyboard character, plus common German keys such as `§`, `€`, `°`, and `²`. Accented Latin letters use their base letter (for example, `ä` becomes `A`); unsupported scripts and emoji use `?`.
+
 ## CLI options
 
 Run `pixel-banner --help` for the short version. The full reference is below; defaults are shown in **bold** and apply unless a preset overrides them.

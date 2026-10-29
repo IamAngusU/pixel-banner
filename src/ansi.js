@@ -2,7 +2,7 @@
 // Each terminal cell uses a half-block so its foreground and background can
 // represent two vertically stacked pixels with 24-bit color.
 import readline from 'node:readline';
-import { GLYPHS, GLYPH_W } from './font.js';
+import { GLYPHS, GLYPH_W, mapTextToGlyphs } from './font.js';
 import { PRESETS } from './presets.js';
 import { DEFAULTS } from './render.js';
 
@@ -38,7 +38,7 @@ function lightInk(color) {
 
 export function buildFrame(text, opts = {}) {
   const o = { ...DEFAULTS, ...PRESETS[opts.preset], ...opts };
-  const chars = [...String(text).toUpperCase()];
+  const chars = mapTextToGlyphs(text);
   if (!chars.length) throw new Error('Text is empty');
 
   const animations = animationsOf(o.animation);

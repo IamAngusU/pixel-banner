@@ -1,6 +1,6 @@
 // Pure renderer: renderSvg(text, options) -> SVG string. No DOM or Node dependencies.
 // All sizes are in "cells" (1 cell = 1 pixel of the pixel font); `scale` only sets the output size.
-import { GLYPHS, GLYPH_W, GLYPH_H } from './font.js';
+import { GLYPHS, GLYPH_W, GLYPH_H, mapTextToGlyphs } from './font.js';
 import { PRESETS } from './presets.js';
 
 export const DEFAULTS = {
@@ -64,7 +64,7 @@ export function renderSvg(text, opts = {}) {
   const animations = new Set((Array.isArray(o.animation) ? o.animation : String(o.animation || 'none').split('+'))
     .map((name) => String(name).trim()).filter(Boolean));
   const hasAnimation = (name) => animations.has(name);
-  const chars = [...String(text).toUpperCase()];
+  const chars = mapTextToGlyphs(text);
   if (!chars.length) throw new Error('Text is empty');
 
   const grids = chars.map((c) => {
@@ -181,7 +181,7 @@ function footerFx(o, W, H) {
   const url = 'GITHUB.COM/IAMANGUSU/PIXEL-BANNER';
   const gh2 = GLYPH_H + 1;        // 1 blank row between lines
   const line = (s) => {
-    const grids = [...s].map((c) => toGrid(GLYPHS[c] ?? GLYPHS['?']));
+    const grids = mapTextToGlyphs(s).map((c) => toGrid(GLYPHS[c] ?? GLYPHS['?']));
     const n = grids.length, gw = grids[0][0].length, sp = 2;
     const w = n * gw + (n - 1) * sp;
     const ox = (i) => i * (gw + sp);

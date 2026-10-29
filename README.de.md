@@ -40,6 +40,8 @@ Mit einer oder mehreren kommagetrennten Farben bestimmst du die Anzahl der Verla
 
 Jede generierte SVG enthält einen unsichtbaren Quelltext-Kommentar mit dem Link zu diesem Repository.
 
+Die Pixel-Schrift unterstützt alle druckbaren ASCII-Tastaturzeichen sowie typische deutsche Tasten wie `§`, `€`, `°` und `²`. Akzentbuchstaben werden auf ihren Grundbuchstaben abgebildet (zum Beispiel wird `ä` zu `A`); nicht unterstützte Schriftsysteme und Emojis erscheinen als `?`.
+
 ## CLI-Optionen
 
 `pixel-banner --help` zeigt eine Kurzfassung. Hier findest du alle Optionen; die Standardwerte sind **fett** markiert und gelten, sofern ein Preset sie nicht überschreibt.
