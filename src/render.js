@@ -97,8 +97,11 @@ export function renderSvg(text, opts = {}) {
   // Move the selected color gradient across the letters. When combined with
   // reveal, begin the color sweep after the last glyph has appeared.
   const motionBegin = reveal ? `${((n - 1) * 0.18 + 0.7).toFixed(2)}s` : '0s';
-  const gradientMotion = shimmerEnabled || floor
-    ? `<animateTransform attributeName="gradientTransform" type="translate" from="0 0" to="${o.vertical ? `0 ${2 * len}` : `${2 * len} 0`}" dur="4s" begin="${motionBegin}" repeatCount="indefinite"/>`
+  // Animate gradient endpoints directly for reliable SVG animation in WebKit and other renderers.
+  // Moving both endpoints by two gradient lengths preserves the spreadMethod="reflect" cycle.
+  const gradientMotion = shimmerEnabled
+    ? `<animate attributeName="${o.vertical ? 'y1' : 'x1'}" values="${fmt(o.vertical ? y1 : x1)};${fmt((o.vertical ? y1 : x1) + 2 * len)}" dur="4s" begin="${motionBegin}" repeatCount="indefinite"/>`
+      + `<animate attributeName="${o.vertical ? 'y2' : 'x2'}" values="${fmt(o.vertical ? y2 : x2)};${fmt((o.vertical ? y2 : x2) + 2 * len)}" dur="4s" begin="${motionBegin}" repeatCount="indefinite"/>`
     : '';
 
   const ox = (i) => o.padding + glyphWidths.slice(0, i).reduce((sum, width) => sum + width, 0) + i * o.spacing;
