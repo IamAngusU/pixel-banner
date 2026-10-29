@@ -1,6 +1,6 @@
 {
   "name": "@iamangusu/pixel-banner",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Pixel-art text banners as SVG, with 3D shadow, gradients and animation (wave/shimmer/blink/floor/reveal). For GitHub READMEs and websites.",
   "type": "module",
   "main": "src/index.js",
