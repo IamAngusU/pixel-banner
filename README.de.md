@@ -43,6 +43,14 @@ Füge die SVG in deine README ein:
 Die Anzahl der Verlaufsfarben bestimmst du selbst: Übergib mit `--colors` eine oder mehrere kommagetrennte Farben.
 Jede generierte SVG enthält außerdem einen unsichtbaren Quelltext-Kommentar mit dem Link zu diesem Repository.
 
+## Terminal
+
+Gib dein eigenes farbiges Pixel-Banner direkt im Terminal aus (Node.js 18+):
+
+```sh
+npx --yes github:IamAngusU/pixel-banner "HALLO" --ansi
+```
+
 ## Icon Marquee
 
 <p align="center"><a href="https://github.com/IamAngusU/icon-marquee"><img src="https://angusu.de/icon-marquee/api/IamAngusU/pixel-banner.svg?include=javascript,nodejs,npm,github&height=56&gap=14&width=680&speed=40&edgeFade=24" alt="JavaScript-, Node.js-, npm- und GitHub-Icons"></a></p>

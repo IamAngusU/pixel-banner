@@ -43,6 +43,14 @@ Embed the SVG in your README:
 Gradient stop count is up to you: pass one or more comma-separated colors with `--colors`.
 Every generated SVG also includes a hidden source comment linking back to this repository.
 
+## Terminal
+
+Print your own colorful pixel banner directly in the terminal (Node.js 18+):
+
+```sh
+npx --yes github:IamAngusU/pixel-banner "HELLO" --ansi
+```
+
 ## Icon Marquee
 
 <p align="center"><a href="https://github.com/IamAngusU/icon-marquee"><img src="https://angusu.de/icon-marquee/api/IamAngusU/pixel-banner.svg?include=javascript,nodejs,npm,github&height=56&gap=14&width=680&speed=40&edgeFade=24" alt="JavaScript, Node.js, npm and GitHub icons"></a></p>
