@@ -5,20 +5,20 @@ import { renderSvg } from '../src/index.js';
 const out = (f, text, opts) => writeFileSync(new URL('../' + f, import.meta.url), renderSvg(text, opts) + '\n');
 
 out('assets/banner.svg', 'PIXEL-BANNER', { preset: 'neon', scale: 6 });
-out('assets/pixel-banner.svg', 'PIXEL-BANNER', { preset: 'neon', animation: 'reveal+shimmer', scale: 8 });
+out('assets/pixel-banner-v2.svg', 'PIXEL-BANNER', { preset: 'neon', animation: 'reveal+shimmer', scale: 8 });
 out('examples/hello.svg', 'HELLO', { preset: 'aiphone', scale: 5 });
 out('examples/neon.svg', 'NEON', { preset: 'neon', scale: 5 });
 out('examples/fire.svg', 'FIRE', { preset: 'fire', scale: 5 });
 out('examples/wave.svg', 'WAVE', { preset: 'mono', animation: 'wave', colors: ['#FF6BD6', '#6BD6FF'], shadow: '#2A1A4A', weight: 2, scale: 5 });
 out('examples/floor.svg', 'FLOOR', { preset: 'floor', scale: 5 });
-out('examples/reveal.svg', 'REVEAL', { preset: 'reveal', scale: 5 });
+out('examples/reveal-shimmer.svg', 'REVEAL', { preset: 'reveal', scale: 5 });
 // light-mode looks, transparent by design (they sit on white pages)
 out('examples/light.svg', 'LIGHT', { preset: 'light', scale: 5 });
-out('examples/light-mint.svg', 'MINT', { preset: 'light-mint', scale: 5 });
+out('examples/light-mint-clean.svg', 'MINT', { preset: 'light-mint', scale: 5 });
 
 // Adaptive, clickable README button based on the generator badge in IamAngusU/badges.
 const pbMark = renderSvg('PB', {
-  preset: 'neon', animation: 'none', depth: 0, padding: 0, spacing: 0, highlight: 0, scale: 5,
+  preset: 'neon', animation: 'none', depth: 0, padding: 0, spacing: 1, highlight: 0, scale: 5,
 });
 const pbViewBox = pbMark.match(/viewBox="([^"]+)"/)[1];
 const pbContent = pbMark.slice(pbMark.indexOf('>') + 1, pbMark.lastIndexOf('</svg>'));
@@ -32,5 +32,5 @@ const generatorButton = `<svg xmlns="http://www.w3.org/2000/svg" width="480" hei
   <path class="badge-sep" d="M268 18V54" fill="none" stroke-width="1.25"/>
   <text class="badge-muted" x="288" y="43" font-family="Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,Helvetica,sans-serif" font-size="20" font-weight="500">Open generator</text>
 </svg>`;
-writeFileSync(new URL('../assets/generator-button.svg', import.meta.url), generatorButton + '\n');
+writeFileSync(new URL('../assets/generator-button-pb.svg', import.meta.url), generatorButton + '\n');
 console.log('generated assets/ and examples/');

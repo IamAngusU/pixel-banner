@@ -1,11 +1,11 @@
 <p align="center">
-  <img src="assets/pixel-banner.svg" alt="Pixel Banner: animated pixel-art lettering" width="520">
+  <img src="assets/pixel-banner-v2.svg" alt="Pixel Banner: animated pixel-art lettering" width="520">
 </p>
 
 <p align="center">Make bold pixel-art text as a small, editable SVG. Choose a preset, tune the colors, then drop it into a README or a website.</p>
 
 <p align="center">
-  <a href="https://iamangusu.github.io/pixel-banner/"><img src="assets/generator-button.svg" alt="Open the Pixel Banner generator" width="360"></a>
+  <a href="https://iamangusu.github.io/pixel-banner/"><img src="assets/generator-button-pb.svg" alt="Open the Pixel Banner generator" width="360"></a>
 </p>
 
 <p align="center"><a href="README.de.md"><img src="docs/assets/readme-language-de.svg" height="40" alt="Diese README auf Deutsch lesen"></a></p>
@@ -14,11 +14,11 @@
 
 | Neon · reveal and shimmer | Fire | Wave |
 |:---:|:---:|:---:|
-| <img src="examples/reveal.svg" alt="Neon lettering that reveals, then shimmers" height="92"> | <img src="examples/fire.svg" alt="Fire gradient lettering" height="92"> | <img src="examples/wave.svg" alt="Waving pixel lettering" height="92"> |
+| <img src="examples/reveal-shimmer.svg" alt="Neon lettering that reveals, then shimmers" height="92"> | <img src="examples/fire.svg" alt="Fire gradient lettering" height="92"> | <img src="examples/wave.svg" alt="Waving pixel lettering" height="92"> |
 
 | Gradient floor | Light mint | Classic neon |
 |:---:|:---:|:---:|
-| <img src="examples/floor.svg" alt="Gradient floor effect" height="92"> | <img src="examples/light-mint.svg" alt="Mint lettering for a light background" height="92"> | <img src="examples/neon.svg" alt="Neon gradient lettering" height="92"> |
+| <img src="examples/floor.svg" alt="Gradient floor effect" height="92"> | <img src="examples/light-mint-clean.svg" alt="Mint lettering for a light background" height="92"> | <img src="examples/neon.svg" alt="Neon gradient lettering" height="92"> |
 
 ## Quick start
 

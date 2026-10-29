@@ -1,11 +1,11 @@
 <p align="center">
-  <img src="assets/pixel-banner.svg" alt="Pixel Banner: animierte Pixel-Art-Schrift" width="520">
+  <img src="assets/pixel-banner-v2.svg" alt="Pixel Banner: animierte Pixel-Art-Schrift" width="520">
 </p>
 
 <p align="center">Kräftige Pixel-Art-Schrift als kleine, bearbeitbare SVG. Stil wählen, Farben anpassen und direkt in einer README oder Website nutzen.</p>
 
 <p align="center">
-  <a href="https://iamangusu.github.io/pixel-banner/"><img src="assets/generator-button.svg" alt="Pixel-Banner-Generator öffnen" width="360"></a>
+  <a href="https://iamangusu.github.io/pixel-banner/"><img src="assets/generator-button-pb.svg" alt="Pixel-Banner-Generator öffnen" width="360"></a>
 </p>
 
 <p align="center"><a href="README.md"><img src="docs/assets/readme-language-en.svg" height="40" alt="Read this README in English"></a></p>
@@ -14,11 +14,11 @@
 
 | Neon · Reveal und Schimmer | Feuer | Welle |
 |:---:|:---:|:---:|
-| <img src="examples/reveal.svg" alt="Neon-Schrift mit Reveal und anschließendem Schimmer" height="92"> | <img src="examples/fire.svg" alt="Schrift mit Feuerverlauf" height="92"> | <img src="examples/wave.svg" alt="Animierte Pixel-Schrift mit Welle" height="92"> |
+| <img src="examples/reveal-shimmer.svg" alt="Neon-Schrift mit Reveal und anschließendem Schimmer" height="92"> | <img src="examples/fire.svg" alt="Schrift mit Feuerverlauf" height="92"> | <img src="examples/wave.svg" alt="Animierte Pixel-Schrift mit Welle" height="92"> |
 
 | Farbiger Boden | Helles Mint | Klassisches Neon |
 |:---:|:---:|:---:|
-| <img src="examples/floor.svg" alt="Farbverlauf unter der Schrift" height="92"> | <img src="examples/light-mint.svg" alt="Mint-Schrift für hellen Hintergrund" height="92"> | <img src="examples/neon.svg" alt="Neon-Schrift mit Farbverlauf" height="92"> |
+| <img src="examples/floor.svg" alt="Farbverlauf unter der Schrift" height="92"> | <img src="examples/light-mint-clean.svg" alt="Mint-Schrift für hellen Hintergrund" height="92"> | <img src="examples/neon.svg" alt="Neon-Schrift mit Farbverlauf" height="92"> |
 
 ## Schnellstart
 
