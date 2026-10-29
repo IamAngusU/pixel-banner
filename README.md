@@ -88,7 +88,7 @@ Run `pixel-banner --help` for the short version. The full reference is below; de
 |---|---|
 | `--ansi` | Print a static, 24-bit color version in the terminal. |
 | `--tui` | Play terminal animations; press Ctrl+C to stop. |
-| `--live` | Open an interactive editor: type, move the caret, or backspace and see the banner update immediately. Press Enter to finish, Esc or Ctrl+C to cancel. Add `-o FILE` to save the finished SVG. |
+| `--live` | Open the interactive live studio. Type your text, then press Tab to edit presets, animation, colors, depth, size, spacing, shadow, background, and other output options with an instant preview. Press Enter to finish from text mode, Ctrl+S from settings, or Ctrl+C to cancel. Add `-o FILE` to choose an SVG output path. |
 | `--width N` | Set terminal wrapping width for `--ansi`, `--tui`, or `--live`. By default the current terminal width is used. |
 
 The web generator also updates its SVG preview as you type and as you change controls. Its depth slider ranges from `0` (flat) to `8` (deep extrusion).
@@ -107,11 +107,13 @@ Play the reveal and color shimmer live:
 npx --yes @iamangusu/pixel-banner "PIXEL-BANNER" --preset neon --animation reveal+shimmer --tui
 ```
 
-Type directly into an interactive terminal preview:
+Open the live studio. Type your banner, press Tab to tune the options, and watch the preview update as you go:
 
 ```sh
-npx --yes @iamangusu/pixel-banner --live --preset neon --animation shimmer
+npx --yes @iamangusu/pixel-banner --live
 ```
+
+In settings, use Up/Down to select an option, Left/Right to change choices and numbers, and Enter to edit values such as colors or the output path. Press Tab to return to text. You can also start with text and flags, for example `pixel-banner "HELLO" --live --preset neon`.
 
 Long terminal banners wrap automatically to the available width. Set `--width 100` to choose a limit yourself.
 

@@ -88,7 +88,7 @@ Die Pixel-Schrift unterstützt alle druckbaren ASCII-Tastaturzeichen sowie typis
 |---|---|
 | `--ansi` | Gibt ein statisches Pixelbild mit 24-Bit-Farben im Terminal aus. |
 | `--tui` | Spielt Animationen im Terminal ab. Mit Strg+C beenden. |
-| `--live` | Öffnet einen interaktiven Editor: Tippen, Cursor bewegen oder löschen und die Vorschau sofort sehen. Enter beendet, Esc oder Strg+C bricht ab. Mit `-o DATEI` wird die fertige SVG gespeichert. |
+| `--live` | Öffnet das interaktive Live-Studio. Gib Text ein und drücke Tab, um Preset, Animation, Farben, Tiefe, Größe, Abstand, Schatten, Hintergrund und weitere Ausgabeoptionen bei sofortiger Vorschau anzupassen. Enter beendet im Textmodus, Strg+S in den Einstellungen, Strg+C bricht ab. Mit `-o DATEI` kannst du den SVG-Ausgabepfad vorgeben. |
 | `--width N` | Legt die Zeilenbreite für `--ansi`, `--tui` oder `--live` fest. Standardmäßig wird die aktuelle Terminalbreite genutzt. |
 
 Auch der Web-Generator aktualisiert die SVG-Vorschau während der Eingabe und bei Änderungen an den Reglern. Der Tiefenregler reicht von `0` (flach) bis `8` (starker 3D-Effekt).
@@ -107,11 +107,13 @@ Spiele Reveal und Farb-Schimmer live ab:
 npx --yes @iamangusu/pixel-banner "PIXEL-BANNER" --preset neon --animation reveal+shimmer --tui
 ```
 
-Gib den Text direkt in eine interaktive Terminal-Vorschau ein:
+Öffne das Live-Studio. Gib deinen Bannertext ein, drücke Tab für die Einstellungen und sieh jede Änderung sofort in der Vorschau:
 
 ```sh
-npx --yes @iamangusu/pixel-banner --live --preset neon --animation shimmer
+npx --yes @iamangusu/pixel-banner --live
 ```
+
+In den Einstellungen wählst du mit Oben/Unten eine Option, änderst Auswahlwerte und Zahlen mit Links/Rechts und bearbeitest Farben oder den Ausgabepfad mit Enter. Mit Tab geht es zurück zum Text. Du kannst auch mit Text und Flags starten, zum Beispiel `pixel-banner "HALLO" --live --preset neon`.
 
 Lange Terminal-Banner werden automatisch an die Fensterbreite angepasst. Mit `--width 100` kannst du die Breite selbst festlegen.
 

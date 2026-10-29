@@ -32,7 +32,7 @@ if (v.help || (!positionals.length && !v.live)) {
   -a none|wave|shimmer|blink|floor|reveal|reveal+shimmer
   Terminal:  --ansi   (statisches Pixelbild mit 24-Bit-Farben ausgeben)
              --tui    (animiertes Pixelbild im Terminal, Strg-C beendet)
-             --live   (Text interaktiv eingeben und Vorschau sofort sehen)`);
+             --live   (Live-Studio: Tab öffnet Einstellungen, Vorschau aktualisiert sofort)`);
   process.exit(v.help ? 0 : 1);
 }
 if (v.preset && !PRESETS[v.preset]) { console.error(`Unknown preset: ${v.preset}`); process.exit(1); }
@@ -63,20 +63,20 @@ if (v.live && (v.tui || v.ansi)) {
 
 if (v.live) {
   const { editLive, buildTerminalFrames, terminalFramesToString } = await import('./ansi.js');
-  let liveText;
+  let result;
   try {
-    liveText = await editLive(text, opts, () => Number(opts.width) > 0 ? opts.width : process.stdout.columns || 0);
+    result = await editLive(text, opts, () => Number(opts.width) > 0 ? opts.width : process.stdout.columns || 0, v.out);
   } catch (error) {
     console.error(error.message);
     process.exit(1);
   }
-  if (liveText === null || liveText.length === 0) process.exit(0);
-  if (v.out) {
-    writeFileSync(v.out, renderSvg(liveText, opts));
-    console.log(`Saved ${v.out}`);
-  } else if (liveText.length) {
-    const terminalColumns = Number(opts.width) > 0 ? opts.width : process.stdout.columns || 0;
-    const frames = buildTerminalFrames(liveText, opts, terminalColumns);
+  if (result === null || result.text.length === 0) process.exit(0);
+  if (result.out) {
+    writeFileSync(result.out, renderSvg(result.text, result.opts));
+    console.log(`Saved ${result.out}`);
+  } else if (result.text.length) {
+    const terminalColumns = Number(result.opts.width) > 0 ? result.opts.width : process.stdout.columns || 0;
+    const frames = buildTerminalFrames(result.text, result.opts, terminalColumns);
     process.stdout.write(terminalFramesToString(frames) + '\n');
   }
 } else if (v.tui || v.ansi) {

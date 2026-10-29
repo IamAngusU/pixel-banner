@@ -289,9 +289,8 @@ export function animate(text, opts = {}, terminalColumns = process.stdout.column
   return cleanup;
 }
 
-// Interactive single-line editor. The same terminal renderer is redrawn on
-// every keypress, so the preview responds as the user types.
-export function editLive(initialText = '', opts = {}, terminalColumns = () => process.stdout.columns || 0) {
+// Interactive live studio. Text and settings share the same terminal preview.
+export function editLive(initialText = '', opts = {}, terminalColumns = () => process.stdout.columns || 0, initialOut = '') {
   const input = process.stdin;
   const output = process.stdout;
   if (!input.isTTY || !output.isTTY || typeof input.setRawMode !== 'function') {
@@ -301,14 +300,149 @@ export function editLive(initialText = '', opts = {}, terminalColumns = () => pr
   return new Promise((resolve) => {
     let text = String(initialText);
     let cursor = [...text].length;
+    const liveOpts = {
+      ...DEFAULTS,
+      ...PRESETS[opts.preset],
+      ...opts,
+      colors: [...(opts.colors ?? PRESETS[opts.preset]?.colors ?? DEFAULTS.colors)],
+    };
+    let presetName = opts.preset || 'custom';
+    let outputPath = String(initialOut || '');
+    let mode = 'text';
+    let selectedSetting = 0;
+    let editing = false;
+    let editBuffer = '';
+    let editCursor = 0;
+    let editError = '';
     let time = 0;
     let timer;
     let finished = false;
     const fps = 12;
+    const validHex = (value) => /^#[0-9a-f]{6}$/i.test(value);
+    const numberField = (key, label, min, max, step, integer = false) => ({
+      key, label, kind: 'number', min, max, step, integer,
+      get: () => liveOpts[key],
+      set: (value) => { liveOpts[key] = value; },
+      parse: (raw) => {
+        const value = Number(raw);
+        if (!Number.isFinite(value) || raw.trim() === '') return { error: 'Enter a number.' };
+        if (value < min || value > max) return { error: `Use a value from ${min} to ${max}.` };
+        if (integer && !Number.isInteger(value)) return { error: 'This setting needs a whole number.' };
+        return { value };
+      },
+    });
+    const inputField = (key, label, get, set, parse = (value) => ({ value })) => ({
+      key, label, kind: 'input', get, set, parse,
+    });
+    const settings = [
+      {
+        key: 'preset', label: 'Preset', kind: 'choice', values: ['custom', ...Object.keys(PRESETS)],
+        get: () => presetName,
+        set: (name) => {
+          presetName = name;
+          if (name === 'custom') {
+            delete liveOpts.preset;
+            return;
+          }
+          const selected = { ...DEFAULTS, ...PRESETS[name] };
+          for (const key of Object.keys(DEFAULTS)) {
+            liveOpts[key] = Array.isArray(selected[key]) ? [...selected[key]] : selected[key];
+          }
+          liveOpts.preset = name;
+        },
+      },
+      inputField('animation', 'Animation', () => liveOpts.animation, (value) => { liveOpts.animation = value; }, (raw) => {
+        const names = raw.split('+').map((name) => name.trim()).filter(Boolean);
+        if (raw.trim() === 'none') return { value: 'none' };
+        if (!names.length || names.some((name) => !['wave', 'shimmer', 'blink', 'floor', 'reveal'].includes(name))) {
+          return { error: 'Use wave, shimmer, blink, floor, reveal, or none (combine with +).' };
+        }
+        return { value: [...new Set(names)].join('+') };
+      }),
+      inputField('colors', 'Colors', () => liveOpts.colors.join(','), (value) => { liveOpts.colors = value.split(','); }, (raw) => {
+        const colors = raw.split(',').map((color) => color.trim());
+        return colors.length && colors.every(validHex)
+          ? { value: colors }
+          : { error: 'Use comma-separated hex colors, for example #00F5D4,#F15BB5.' };
+      }),
+      inputField('shadow', 'Shadow', () => liveOpts.shadow, (value) => { liveOpts.shadow = value; }, (raw) =>
+        validHex(raw.trim()) ? { value: raw.trim() } : { error: 'Use a hex color such as #08305A.' }),
+      inputField('bg', 'Background', () => liveOpts.bg ?? 'none', (value) => { liveOpts.bg = value; }, (raw) => {
+        const value = raw.trim();
+        if (!value || value.toLowerCase() === 'none') return { value: null };
+        return validHex(value) ? { value } : { error: 'Use a hex color or none.' };
+      }),
+      numberField('scale', 'Scale', 1, 64, 1, true),
+      numberField('glyphWidth', 'Glyph width', 40, 160, 5),
+      numberField('depth', 'Depth', 0, 40, 1, true),
+      numberField('spacing', 'Spacing', 0, 8, 0.25),
+      {
+        key: 'weight', label: 'Weight', kind: 'choice', values: [1, 2],
+        get: () => liveOpts.weight, set: (value) => { liveOpts.weight = value; },
+      },
+      numberField('highlight', 'Highlight', 0, 1, 0.05),
+      numberField('padding', 'Padding', 0, 16, 0.25),
+      {
+        ...numberField('width', 'Terminal width', 20, 400, 4, true),
+        get: () => Number(liveOpts.width) || Math.max(20, Number(terminalColumns()) || 80),
+      },
+      { key: 'taper', label: 'Taper', kind: 'boolean', get: () => liveOpts.taper, set: (value) => { liveOpts.taper = value; } },
+      { key: 'vertical', label: 'Vertical gradient', kind: 'boolean', get: () => liveOpts.vertical, set: (value) => { liveOpts.vertical = value; } },
+      { key: 'light', label: 'Light mode', kind: 'boolean', get: () => liveOpts.light, set: (value) => { liveOpts.light = value; } },
+      { key: 'transparent', label: 'Transparent', kind: 'boolean', get: () => liveOpts.transparent, set: (value) => { liveOpts.transparent = value; } },
+      { key: 'footer', label: 'Footer credit', kind: 'boolean', get: () => liveOpts.footer, set: (value) => { liveOpts.footer = value; } },
+      inputField('out', 'Output file', () => outputPath, (value) => { outputPath = value; }),
+    ];
+    const setSetting = (field, value) => {
+      field.set(value);
+      if (field.key === 'light' && value && liveOpts.bg == null) liveOpts.transparent = true;
+      if (!['preset', 'out'].includes(field.key)) {
+        presetName = 'custom';
+        delete liveOpts.preset;
+      }
+      editError = '';
+      time = 0;
+      restartAnimation();
+    };
+    const valueLabel = (field) => {
+      if (field.kind === 'boolean') return field.get() ? 'on' : 'off';
+      if (field.key === 'bg' && field.get() === 'none') return 'none';
+      if (field.key === 'out' && !field.get()) return '(not saving)';
+      if (Array.isArray(field.get())) return field.get().join(',');
+      return String(field.get());
+    };
+    const cycle = (field, direction) => {
+      if (field.kind === 'choice') {
+        const index = field.values.indexOf(field.get());
+        const next = (index + direction + field.values.length) % field.values.length;
+        setSetting(field, field.values[next]);
+      } else if (field.kind === 'boolean') {
+        setSetting(field, !field.get());
+      } else if (field.kind === 'number') {
+        const raw = Math.max(field.min, Math.min(field.max, Number(field.get()) + direction * field.step));
+        const value = Math.round(raw * 100) / 100;
+        setSetting(field, field.integer ? Math.round(value) : value);
+      }
+    };
+    const beginEdit = (field) => {
+      editing = true;
+      editBuffer = String(valueLabel(field) === '(not saving)' ? '' : valueLabel(field));
+      editCursor = [...editBuffer].length;
+      editError = '';
+    };
+    const applyEditBuffer = (field) => {
+      const parsed = field.parse ? field.parse(editBuffer) : { value: editBuffer };
+      if (parsed.error) {
+        editError = parsed.error;
+        return false;
+      }
+      setSetting(field, parsed.value);
+      return true;
+    };
     const restartAnimation = () => {
       clearInterval(timer);
       if (!text.length) return;
-      const frame = buildFrame(text || ' ', opts);
+      const frame = buildFrame(text || ' ', liveOpts);
       const looping = ['wave', 'shimmer', 'blink', 'floor'].some((name) => frame.animations.has(name));
       const revealEnd = frame.animations.has('reveal') ? (frame.n - 1) * 0.18 + 0.7 : 0;
       if (!looping && revealEnd <= 0) return;
@@ -326,17 +460,41 @@ export function editLive(initialText = '', opts = {}, terminalColumns = () => pr
       const start = Math.max(0, Math.min(cursor - visibleWidth + 1, chars.length - visibleWidth));
       const shown = chars.slice(start, start + visibleWidth);
       const caret = Math.max(0, Math.min(shown.length, cursor - start));
-      shown.splice(caret, 0, '\x1b[7m \x1b[0m');
+      if (mode === 'text' && !editing) shown.splice(caret, 0, '\x1b[7m \x1b[0m');
       const inputLine = `${start > 0 ? '…' : ''}${shown.join('')}${start + visibleWidth < chars.length ? '…' : ''}`;
       let preview = 'Type text above to see the banner.';
       if (text.length) {
         try {
-          preview = terminalFramesToString(buildTerminalFrames(text, opts, columns), time);
+          const width = Number(liveOpts.width) > 0 ? Number(liveOpts.width) : columns;
+          preview = terminalFramesToString(buildTerminalFrames(text, liveOpts, width), time);
         } catch (error) {
           preview = `Preview error: ${error.message}`;
         }
       }
-      output.write(`\x1b[2J\x1b[HPIXEL-BANNER / LIVE INPUT\nType text · Enter to finish · Esc/Ctrl+C to cancel\n\n> ${inputLine}\n\n${preview}\x1b[J`);
+      const lines = [
+        'PIXEL-BANNER / LIVE STUDIO',
+        '',
+        `Text  > ${inputLine || (mode === 'text' ? '\x1b[7m \x1b[0m' : '')}`,
+      ];
+      if (mode === 'settings') {
+        const count = settings.length;
+        const from = Math.max(0, Math.min(selectedSetting - 2, count - 5));
+        lines.push(`Settings ${selectedSetting + 1}/${count} · ↑/↓ select · ←/→ change · Tab text`);
+        for (let i = from; i < Math.min(count, from + 5); i++) {
+          const field = settings[i];
+          const active = i === selectedSetting;
+          const value = active && editing
+            ? [...editBuffer].map((character, index) => index === editCursor ? `\x1b[7m${character || ' '}\x1b[0m` : character).join('') + (editCursor >= [...editBuffer].length ? '\x1b[7m \x1b[0m' : '')
+            : valueLabel(field);
+          lines.push(`${active ? '›' : ' '} ${field.label}: ${value}`);
+        }
+        if (editing) lines.push(editError || 'Enter apply · Esc cancel edit');
+        else lines.push('Enter edit · Ctrl+S finish · Esc back to text · Ctrl+C cancel');
+      } else {
+        lines.push(editing ? 'Enter apply · Esc cancel edit · Ctrl+S finish' : 'Type text · Tab settings · Enter finish · Ctrl+C cancel');
+      }
+      lines.push('', 'Preview', preview);
+      output.write(`\x1b[2J\x1b[H${lines.join('\n')}\x1b[J`);
     };
 
     const cleanup = () => {
@@ -359,35 +517,96 @@ export function editLive(initialText = '', opts = {}, terminalColumns = () => pr
 
     const onKeypress = (char, key = {}) => {
       if (key.ctrl && (key.name === 'c' || key.name === 'd')) return finish(null);
-      if (key.name === 'escape') return finish(null);
-      if (key.name === 'return' || key.name === 'enter') return finish(text);
-
-      const chars = [...text];
-      if (key.name === 'backspace') {
-        if (cursor > 0) { chars.splice(cursor - 1, 1); cursor--; }
-      } else if (key.name === 'delete') {
-        if (cursor < chars.length) chars.splice(cursor, 1);
-      } else if (key.name === 'left') {
-        cursor = Math.max(0, cursor - 1);
-      } else if (key.name === 'right') {
-        cursor = Math.min(chars.length, cursor + 1);
-      } else if (key.name === 'home') {
-        cursor = 0;
-      } else if (key.name === 'end') {
-        cursor = chars.length;
-      } else if (char && !key.ctrl && !key.meta && !/^[\x00-\x1f\x7f]$/.test(char)) {
-        const incoming = [...char];
-        chars.splice(cursor, 0, ...incoming);
-        cursor += incoming.length;
-      } else {
+      if (key.ctrl && key.name === 's' && !editing) return finish({ text, opts: liveOpts, out: outputPath });
+      if (key.name === 'escape') {
+        if (editing) {
+          editing = false;
+          editError = '';
+        } else if (mode === 'settings') {
+          mode = 'text';
+        }
+        draw();
         return;
       }
-      const updatedText = chars.join('');
-      if (updatedText !== text) {
-        text = updatedText;
-        time = 0;
-        restartAnimation();
+
+      if (editing) {
+        const field = settings[selectedSetting];
+        const chars = [...editBuffer];
+        if (key.name === 'return' || key.name === 'enter') {
+          if (applyEditBuffer(field)) editing = false;
+          draw();
+          return;
+        }
+        if (key.name === 'backspace') {
+          if (editCursor > 0) { chars.splice(editCursor - 1, 1); editCursor--; }
+        } else if (key.name === 'delete') {
+          if (editCursor < chars.length) chars.splice(editCursor, 1);
+        } else if (key.ctrl && key.name === 'a') {
+          chars.splice(0, chars.length);
+          editCursor = 0;
+        } else if (key.name === 'left') {
+          editCursor = Math.max(0, editCursor - 1);
+        } else if (key.name === 'right') {
+          editCursor = Math.min(chars.length, editCursor + 1);
+        } else if (key.name === 'home') {
+          editCursor = 0;
+        } else if (key.name === 'end') {
+          editCursor = chars.length;
+        } else if (char && !key.ctrl && !key.meta && !/^[\x00-\x1f\x7f]$/.test(char)) {
+          const incoming = [...char];
+          chars.splice(editCursor, 0, ...incoming);
+          editCursor += incoming.length;
+        } else return;
+        editBuffer = chars.join('');
+        applyEditBuffer(field);
+        draw();
+        return;
       }
+
+      if (mode === 'text') {
+        if (key.name === 'tab') { mode = 'settings'; draw(); return; }
+        if (key.name === 'return' || key.name === 'enter') return finish({ text, opts: liveOpts, out: outputPath });
+        const chars = [...text];
+        if (key.name === 'backspace') {
+          if (cursor > 0) { chars.splice(cursor - 1, 1); cursor--; }
+        } else if (key.name === 'delete') {
+          if (cursor < chars.length) chars.splice(cursor, 1);
+        } else if (key.name === 'left') {
+          cursor = Math.max(0, cursor - 1);
+        } else if (key.name === 'right') {
+          cursor = Math.min(chars.length, cursor + 1);
+        } else if (key.name === 'home') {
+          cursor = 0;
+        } else if (key.name === 'end') {
+          cursor = chars.length;
+        } else if (char && !key.ctrl && !key.meta && !/^[\x00-\x1f\x7f]$/.test(char)) {
+          const incoming = [...char];
+          chars.splice(cursor, 0, ...incoming);
+          cursor += incoming.length;
+        } else return;
+        const updatedText = chars.join('');
+        if (updatedText !== text) {
+          text = updatedText;
+          time = 0;
+          restartAnimation();
+        }
+        draw();
+        return;
+      }
+
+      if (key.name === 'tab') { mode = 'text'; draw(); return; }
+      if (key.name === 'up') { selectedSetting = (selectedSetting - 1 + settings.length) % settings.length; draw(); return; }
+      if (key.name === 'down') { selectedSetting = (selectedSetting + 1) % settings.length; draw(); return; }
+      const field = settings[selectedSetting];
+      if (key.name === 'left') { cycle(field, -1); draw(); return; }
+      if (key.name === 'right') { cycle(field, 1); draw(); return; }
+      if (key.name === 'return' || key.name === 'enter') {
+        if (field.kind === 'input' || field.kind === 'number') beginEdit(field);
+        else cycle(field, 1);
+        draw();
+        return;
+      }
+      if (char === ' ' && field.kind === 'boolean') { cycle(field, 1); draw(); return; }
       draw();
     };
 
