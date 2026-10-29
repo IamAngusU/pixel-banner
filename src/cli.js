@@ -10,6 +10,7 @@ const { values: v, positionals } = parseArgs({
   options: {
     out: str('o'), preset: str('p'), colors: str(), shadow: str(), bg: str(), animation: str('a'),
     scale: str(), 'glyph-width': str(), width: str(), depth: str(), spacing: str(), weight: str(), highlight: str(), padding: str(),
+    'reveal-duration': str(), 'reveal-stagger': str(), 'reveal-bezier': str(), 'reveal-stagger-curve': str(),
     taper: { type: 'boolean' },
     vertical: { type: 'boolean' }, footer: { type: 'boolean' },
     light: { type: 'boolean' }, dark: { type: 'boolean' }, transparent: { type: 'boolean' },
@@ -28,6 +29,8 @@ if (v.help || (!positionals.length && !v.live)) {
   --glyph-width 40..160  (Glyphs schmaler/breiter)
   --width 120  (ANSI/TUI/Live-Zeilenbreite; Standard: verfügbare Fensterbreite)
   --taper        (jedes folgende Zeichen bis zu 28% schmaler)
+  --reveal-duration 0.7  --reveal-stagger 0.18
+  --reveal-bezier 0.22,1,0.36,1  --reveal-stagger-curve linear|accelerate|decelerate
   --dark     (Lightmode aus, z. B. um ein light-Preset zu überschreiben)
   -a none|wave|shimmer|blink|floor|reveal|reveal+shimmer
   Terminal:  --ansi   (statisches Pixelbild mit 24-Bit-Farben ausgeben)
@@ -37,7 +40,7 @@ if (v.help || (!positionals.length && !v.live)) {
 }
 if (v.preset && !PRESETS[v.preset]) { console.error(`Unknown preset: ${v.preset}`); process.exit(1); }
 
-const NUM = ['scale', 'glyph-width', 'width', 'depth', 'spacing', 'weight', 'highlight', 'padding'];
+const NUM = ['scale', 'glyph-width', 'width', 'depth', 'spacing', 'weight', 'highlight', 'padding', 'reveal-duration', 'reveal-stagger'];
 const BOOL_SKIP = ['out', 'help', 'tui', 'ansi', 'live'];
 const opts = {};
 for (const [k, val] of Object.entries(v)) {
@@ -45,8 +48,8 @@ for (const [k, val] of Object.entries(v)) {
   if (val === undefined) continue;
   // --dark is just "light off"; --light implies a transparent background unless --bg is set
   if (k === 'dark') { opts.light = false; continue; }
-  const key = k === 'glyph-width' ? 'glyphWidth' : k;
-  opts[key] = NUM.includes(k) ? Number(val) : k === 'colors' ? val.split(',') : val;
+  const key = ({ 'glyph-width': 'glyphWidth', 'reveal-duration': 'revealDuration', 'reveal-stagger': 'revealStagger', 'reveal-bezier': 'revealBezier', 'reveal-stagger-curve': 'revealStaggerCurve' })[k] || k;
+  opts[key] = NUM.includes(k) ? Number(val) : (k === 'colors' || k === 'reveal-bezier') ? val.split(',').map((item) => Number(item.trim())) : val;
 }
 if (opts.light && opts.bg === undefined) opts.transparent = true;
 if (opts.depth !== undefined && (!Number.isSafeInteger(opts.depth) || opts.depth < 0)) {
