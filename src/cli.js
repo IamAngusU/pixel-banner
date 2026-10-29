@@ -28,7 +28,7 @@ if (v.help || !positionals.length) {
   --glyph-width 40..160  (Glyphs schmaler/breiter)
   --taper        (jedes folgende Zeichen bis zu 28% schmaler)
   --dark     (Lightmode aus, z. B. um ein light-Preset zu überschreiben)
-  -a none|wave|shimmer|blink|floor|reveal
+  -a none|wave|shimmer|blink|floor|reveal|reveal+shimmer
   Terminal:  --ansi   (eine statische ANSI-Ansicht ausgeben)
              --tui    (animierte Live-Ansicht im Terminal, Strg-C beendet)`);
   process.exit(v.help ? 0 : 1);

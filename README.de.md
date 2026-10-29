@@ -1,36 +1,50 @@
 <p align="center">
-  <img src="assets/pixel-banner.svg" alt="PIXEL-BANNER" width="520">
+  <img src="assets/pixel-banner.svg" alt="Pixel Banner: animierte Pixel-Art-Schrift" width="520">
 </p>
 
-<p align="center"><strong>Pixel-Art-Textbanner als bearbeitbare SVGs.</strong><br>Stil wählen, Farben und Effekte anpassen und das Banner in einer README oder auf einer Website nutzen.</p>
+<p align="center">Kräftige Pixel-Art-Schrift als kleine, bearbeitbare SVG. Stil wählen, Farben anpassen und direkt in einer README oder Website nutzen.</p>
 
 <p align="center">
-  <a href="README.md"><img src="docs/assets/readme-language-en.svg" height="40" alt="Read this README in English"></a>
+  <a href="https://iamangusu.github.io/pixel-banner/"><img src="assets/generator-button.svg" alt="Pixel-Banner-Generator öffnen" width="360"></a>
 </p>
 
-<p align="center"><a href="https://iamangusu.github.io/pixel-banner/">Web-App öffnen</a> · <a href="#schnellstart">Schnellstart</a></p>
+<p align="center"><a href="README.md"><img src="docs/assets/readme-language-en.svg" height="40" alt="Read this README in English"></a></p>
 
-## Banner erstellen
+## Galerie
 
-Öffne die [Web-App](https://iamangusu.github.io/pixel-banner/), gib deinen Text ein, wähle einen Stil und lade die SVG-Datei herunter.
+| Neon · Reveal und Schimmer | Feuer | Welle |
+|:---:|:---:|:---:|
+| <img src="examples/reveal.svg" alt="Neon-Schrift mit Reveal und anschließendem Schimmer" height="92"> | <img src="examples/fire.svg" alt="Schrift mit Feuerverlauf" height="92"> | <img src="examples/wave.svg" alt="Animierte Pixel-Schrift mit Welle" height="92"> |
 
-Oder nutze die Kommandozeile (Node.js 18+):
+| Farbiger Boden | Helles Mint | Klassisches Neon |
+|:---:|:---:|:---:|
+| <img src="examples/floor.svg" alt="Farbverlauf unter der Schrift" height="92"> | <img src="examples/light-mint.svg" alt="Mint-Schrift für hellen Hintergrund" height="92"> | <img src="examples/neon.svg" alt="Neon-Schrift mit Farbverlauf" height="92"> |
+
+## Schnellstart
+
+Öffne den [Web-Generator](https://iamangusu.github.io/pixel-banner/), um ohne Installation ein Banner zu erstellen.
+
+Oder erzeuge es mit Node.js 18+:
 
 ```sh
-npx github:IamAngusU/pixel-banner "HALLO" -p neon -o hallo.svg
+npx github:IamAngusU/pixel-banner "HALLO" \
+  --preset neon \
+  --animation reveal+shimmer \
+  --colors "#24D6C8,#39A7FF,#C879FF" \
+  --out hallo.svg
 ```
 
-Füge das Ergebnis in eine README ein:
+Füge die SVG in deine README ein:
 
 ```md
 ![HALLO](hallo.svg)
 ```
 
-## Icon-Marquee
+Die Anzahl der Verlaufsfarben bestimmst du selbst: Übergib mit `--colors` eine oder mehrere kommagetrennte Farben.
 
-[![JavaScript-, Node.js-, npm- und GitHub-Icons](https://angusu.de/icon-marquee/api/IamAngusU/pixel-banner.svg?include=javascript,nodejs,npm,github&height=56&gap=14&width=680&speed=40&edgeFade=24)](https://github.com/IamAngusU/icon-marquee)
+## Icon Marquee
 
-Erstellt mit dem [Icon-Marquee-Generator](https://github.com/IamAngusU/icon-marquee).
+<p align="center"><a href="https://github.com/IamAngusU/icon-marquee"><img src="https://angusu.de/icon-marquee/api/IamAngusU/pixel-banner.svg?include=javascript,nodejs,npm,github&height=56&gap=14&width=680&speed=40&edgeFade=24" alt="JavaScript-, Node.js-, npm- und GitHub-Icons"></a></p>
 
 ## Lizenz
 

@@ -1,36 +1,50 @@
 <p align="center">
-  <img src="assets/pixel-banner.svg" alt="PIXEL-BANNER" width="520">
+  <img src="assets/pixel-banner.svg" alt="Pixel Banner: animated pixel-art lettering" width="520">
 </p>
 
-<p align="center"><strong>Pixel-art text banners, made as editable SVGs.</strong><br>Choose a preset, adjust the look, and use your banner in a README or on a website.</p>
+<p align="center">Make bold pixel-art text as a small, editable SVG. Choose a preset, tune the colors, then drop it into a README or a website.</p>
 
 <p align="center">
-  <a href="README.de.md"><img src="docs/assets/readme-language-de.svg" height="40" alt="Diese README auf Deutsch lesen"></a>
+  <a href="https://iamangusu.github.io/pixel-banner/"><img src="assets/generator-button.svg" alt="Open the Pixel Banner generator" width="360"></a>
 </p>
 
-<p align="center"><a href="https://iamangusu.github.io/pixel-banner/">Open the web app</a> · <a href="#quick-start">Quick start</a></p>
+<p align="center"><a href="README.de.md"><img src="docs/assets/readme-language-de.svg" height="40" alt="Diese README auf Deutsch lesen"></a></p>
 
-## Create a banner
+## Gallery
 
-Open the [web app](https://iamangusu.github.io/pixel-banner/), type your text, choose a preset, and download the SVG.
+| Neon · reveal and shimmer | Fire | Wave |
+|:---:|:---:|:---:|
+| <img src="examples/reveal.svg" alt="Neon lettering that reveals, then shimmers" height="92"> | <img src="examples/fire.svg" alt="Fire gradient lettering" height="92"> | <img src="examples/wave.svg" alt="Waving pixel lettering" height="92"> |
 
-Or use the command line (Node.js 18+):
+| Gradient floor | Light mint | Classic neon |
+|:---:|:---:|:---:|
+| <img src="examples/floor.svg" alt="Gradient floor effect" height="92"> | <img src="examples/light-mint.svg" alt="Mint lettering for a light background" height="92"> | <img src="examples/neon.svg" alt="Neon gradient lettering" height="92"> |
+
+## Quick start
+
+Open the [web generator](https://iamangusu.github.io/pixel-banner/) to make a banner without installing anything.
+
+Or generate one with Node.js 18+:
 
 ```sh
-npx github:IamAngusU/pixel-banner "HELLO" -p neon -o hello.svg
+npx github:IamAngusU/pixel-banner "HELLO" \
+  --preset neon \
+  --animation reveal+shimmer \
+  --colors "#24D6C8,#39A7FF,#C879FF" \
+  --out hello.svg
 ```
 
-Add the result to a README:
+Embed the SVG in your README:
 
 ```md
 ![HELLO](hello.svg)
 ```
 
-## Icon marquee
+Gradient stop count is up to you: pass one or more comma-separated colors with `--colors`.
 
-[![JavaScript, Node.js, npm and GitHub icons](https://angusu.de/icon-marquee/api/IamAngusU/pixel-banner.svg?include=javascript,nodejs,npm,github&height=56&gap=14&width=680&speed=40&edgeFade=24)](https://github.com/IamAngusU/icon-marquee)
+## Icon Marquee
 
-Made with the [Icon Marquee](https://github.com/IamAngusU/icon-marquee) generator.
+<p align="center"><a href="https://github.com/IamAngusU/icon-marquee"><img src="https://angusu.de/icon-marquee/api/IamAngusU/pixel-banner.svg?include=javascript,nodejs,npm,github&height=56&gap=14&width=680&speed=40&edgeFade=24" alt="JavaScript, Node.js, npm and GitHub icons"></a></p>
 
 ## License
 

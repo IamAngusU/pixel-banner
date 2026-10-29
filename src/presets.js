@@ -5,7 +5,7 @@ export const PRESETS = {
   fire:    { colors: ['#FFD60A', '#FF7B00', '#E5383B'], shadow: '#5A1A12', weight: 2, depth: 3 },
   mono:    { colors: ['#F2F2F2'], shadow: '#555555', weight: 1, depth: 2 },
   floor:   { colors: ['#00F5D4', '#00BBF9', '#F15BB5'], shadow: '#08305A', weight: 1, depth: 2, animation: 'floor' },
-  reveal:  { colors: ['#5B6CFF', '#A66BFF'], shadow: '#2B2A6B', weight: 2, depth: 3, animation: 'reveal' },
+  reveal:  { colors: ['#5B6CFF', '#A66BFF'], shadow: '#2B2A6B', weight: 2, depth: 3, animation: 'reveal+shimmer' },
   // light mode: ink on paper, transparent by default (saturated colors that stay
   // readable on a white page; bright pastels would disappear there)
   light:       { light: true, transparent: true, colors: ['#2F3AE0', '#8A2BE2'], shadow: '#B9B9D6', weight: 2, depth: 3, highlight: 0.18 },

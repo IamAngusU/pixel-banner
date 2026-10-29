@@ -55,7 +55,7 @@ test('svg is responsive: viewBox + preserveAspectRatio, no fixed CSS', () => {
 
 test('animations add the expected elements', () => {
   assert.match(renderSvg('A', { animation: 'wave' }), /animateTransform[^>]*type="translate"/);
-  assert.match(renderSvg('A', { animation: 'shimmer' }), /gradientTransform/);
+  assert.match(renderSvg('A', { animation: 'shimmer' }), /<animate attributeName="x1"/);
   assert.match(renderSvg('A', { animation: 'blink' }), /attributeName="opacity"/);
   assert.ok(!renderSvg('A').includes('<animate'));
 });
@@ -67,7 +67,7 @@ test('gradient faces use shared banner coordinates so shimmer spans the text', (
   const firstX = (path) => Number(path.match(/M([\d.-]+)/)[1]);
   assert.ok(firstX(facePaths[1]) > firstX(facePaths[0]), 'each glyph face is positioned in banner coordinates');
   assert.match(svg, /<linearGradient id="f" gradientUnits="userSpaceOnUse" x1="1" y1="0" x2="\d+" y2="0"/);
-  assert.match(svg, /<animateTransform attributeName="gradientTransform"/);
+  assert.match(svg, /<animate attributeName="x1" from="1" to="23" dur="4s" begin="0s" repeatCount="indefinite"\/>/);
 });
 
 test('shimmer adds a moving bright band over the face gradient', () => {
@@ -75,7 +75,13 @@ test('shimmer adds a moving bright band over the face gradient', () => {
   assert.match(svg, /<linearGradient id="shine"[^>]*>/);
   assert.match(svg, /stop-color="#fff" stop-opacity="0\.85"/);
   assert.match(svg, /fill="url\(#shine\)"/);
-  assert.match(svg, /<animateTransform attributeName="gradientTransform"[^>]*dur="2\.6s"/);
+  assert.match(svg, /<animate attributeName="x1" from="-2" to="12" dur="2\.6s" begin="0s" repeatCount="indefinite"\/>/);
+  assert.match(svg, /<animate attributeName="x2" from="1" to="15" dur="2\.6s" begin="0s" repeatCount="indefinite"\/>/);
+
+  const afterReveal = renderSvg('HI', { animation: 'reveal+shimmer' });
+  assert.equal([...afterReveal.matchAll(/<animate attributeName="opacity" values="0;1"/g)].length, 2);
+  assert.match(afterReveal, /<animate attributeName="x1"[^>]*dur="4s" begin="0\.88s"/);
+  assert.match(afterReveal, /<animate attributeName="x1"[^>]*dur="2\.6s" begin="0\.88s"/);
 });
 
 test('renderer keeps any requested number of gradient stops', () => {
@@ -99,7 +105,7 @@ test('font data is well-formed', () => {
 test('floor animation adds a gradient floor band', () => {
   const svg = renderSvg('HI', { animation: 'floor' });
   assert.ok(svg.includes('reflect'), 'gradient spreadMethod reflect present');
-  assert.ok(svg.includes('animateTransform'), 'floor drives a moving gradient');
+  assert.match(svg, /<animate attributeName="x"/, 'floor bands move below the text');
   assert.ok(!svg.includes('NaN') && !svg.includes('undefined'));
 });
 

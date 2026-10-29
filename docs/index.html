@@ -55,7 +55,7 @@ input[type=range]{--range-progress:50%;appearance:none;-webkit-appearance:none;w
 
   <section class="control-section">
    <div class="section-head"><span class="section-num">04</span><span class="section-title">MOTION & EDITOR</span><span class="section-note">ANIMATION / INTERFACE</span></div>
-   <div class="row"><label for="animation">Animation</label><div class="ctl"><select id="animation"><option value="none">00 / Static</option><option value="wave">01 / Wave</option><option value="shimmer">02 / Shimmer</option><option value="blink">03 / Blink</option><option value="floor">04 / Gradient floor</option><option value="reveal">05 / Letter reveal</option></select></div></div>
+   <div class="row"><label for="animation">Animation</label><div class="ctl"><select id="animation"><option value="none">00 / Static</option><option value="wave">01 / Wave</option><option value="shimmer">02 / Shimmer</option><option value="blink">03 / Blink</option><option value="floor">04 / Gradient floor</option><option value="reveal">05 / Letter reveal</option><option value="reveal+shimmer">06 / Reveal then shimmer</option></select></div></div>
    <div class="row"><label for="uiTheme">Editor theme</label><div class="ctl"><select id="uiTheme"><option value="auto">System default</option><option value="dark">Dark terminal</option><option value="light">Light terminal</option></select></div></div>
   </section>
 
@@ -107,7 +107,7 @@ const PRESETS = {
   fire:    { colors: ['#FFD60A', '#FF7B00', '#E5383B'], shadow: '#5A1A12', weight: 2, depth: 3 },
   mono:    { colors: ['#F2F2F2'], shadow: '#555555', weight: 1, depth: 2 },
   floor:   { colors: ['#00F5D4', '#00BBF9', '#F15BB5'], shadow: '#08305A', weight: 1, depth: 2, animation: 'floor' },
-  reveal:  { colors: ['#5B6CFF', '#A66BFF'], shadow: '#2B2A6B', weight: 2, depth: 3, animation: 'reveal' },
+  reveal:  { colors: ['#5B6CFF', '#A66BFF'], shadow: '#2B2A6B', weight: 2, depth: 3, animation: 'reveal+shimmer' },
   // light mode: ink on paper, transparent by default (saturated colors that stay
   // readable on a white page; bright pastels would disappear there)
   light:       { light: true, transparent: true, colors: ['#2F3AE0', '#8A2BE2'], shadow: '#B9B9D6', weight: 2, depth: 3, highlight: 0.18 },
@@ -135,7 +135,7 @@ const DEFAULTS = {
   depth: 3,            // 3D shadow depth in cells
   shadow: '#2B2A6B',   // shadow color (hex)
   highlight: 0.25,     // opacity of the light top edge (0 = off)
-  animation: 'none',   // none | wave | shimmer | blink | floor | reveal
+  animation: 'none',   // none | wave | shimmer | blink | floor | reveal | reveal+shimmer
   bg: null,            // background color, or null for transparent
   transparent: false,  // true = never paint a background rect (overrides bg)
   light: false,        // true = light-mode look (bright shadow, dark shine, framed for white pages)
@@ -182,6 +182,9 @@ function runs(g, ox, keep, sx = 1, oy = 0) {
 
 function renderSvg(text, opts = {}) {
   const o = { ...DEFAULTS, ...PRESETS[opts.preset], ...opts };
+  const animations = new Set((Array.isArray(o.animation) ? o.animation : String(o.animation || 'none').split('+'))
+    .map((name) => String(name).trim()).filter(Boolean));
+  const hasAnimation = (name) => animations.has(name);
   const chars = [...String(text).toUpperCase()];
   if (!chars.length) throw new Error('Text is empty');
 
@@ -194,9 +197,11 @@ function renderSvg(text, opts = {}) {
   const taperAmount = o.taper && n > 1 ? 0.28 : 0;
   const glyphScale = (i) => widthScale * (1 - taperAmount * (i / Math.max(1, n - 1)));
   const glyphWidths = grids.map((g, i) => g[0].length * glyphScale(i));
-  const wave = o.animation === 'wave' ? 1 : 0;
+  const wave = hasAnimation('wave') ? 1 : 0;
   const glyphY = o.padding + wave;
-  const floor = o.animation === 'floor';
+  const floor = hasAnimation('floor');
+  const reveal = hasAnimation('reveal');
+  const shimmerEnabled = hasAnimation('shimmer');
   const floorH = floor ? 6 : 0;   // gradient floor band below the text
   const footerH = o.footer ? (2 * (GLYPH_H + 1) + 3) : 0;  // two text lines + gap
   const W = 2 * o.padding + glyphWidths.reduce((sum, width) => sum + width, 0) + (n - 1) * o.spacing + o.depth;
@@ -210,20 +215,29 @@ function renderSvg(text, opts = {}) {
   const colors = o.colors.length > 1 ? o.colors : [o.colors[0], o.colors[0]];
 
   const stops = colors.map((c, i) => `<stop offset="${(i / (colors.length - 1)).toFixed(3)}" stop-color="${c}"/>`).join('');
-  // shimmer also drives the floor's moving gradient
-  const shimmer = o.animation === 'shimmer' || floor
-    ? `<animateTransform attributeName="gradientTransform" type="translate" from="0 0" to="${o.vertical ? `0 ${2 * len}` : `${2 * len} 0`}" dur="4s" repeatCount="indefinite"/>` : '';
+  // Animate gradient coordinates directly. GitHub renders regular SVG <animate>
+  // (used by reveal) more reliably than <animateTransform> on gradientTransform.
+  // When reveal is enabled, start the shimmer after the last glyph has appeared.
+  const motionBegin = reveal ? `${((n - 1) * 0.18 + 0.7).toFixed(2)}s` : '0s';
+  const gradientMotion = shimmerEnabled || floor
+    ? o.vertical
+      ? `<animate attributeName="y1" from="${y1}" to="${y1 + 2 * len}" dur="4s" begin="${motionBegin}" repeatCount="indefinite"/><animate attributeName="y2" from="${y2}" to="${y2 + 2 * len}" dur="4s" begin="${motionBegin}" repeatCount="indefinite"/>`
+      : `<animate attributeName="x1" from="${x1}" to="${x1 + 2 * len}" dur="4s" begin="${motionBegin}" repeatCount="indefinite"/><animate attributeName="x2" from="${x2}" to="${x2 + 2 * len}" dur="4s" begin="${motionBegin}" repeatCount="indefinite"/>`
+    : '';
   // A narrow white band makes shimmer visible even when the base colors are close.
   const bandWidth = Math.max(3, Math.min(12, len * 0.18));
   const bandOffset = o.vertical ? glyphY : o.padding;
-  const bandFrom = o.vertical ? `0 ${bandOffset - bandWidth}` : `${bandOffset - bandWidth} 0`;
-  const bandTo = o.vertical ? `0 ${bandOffset + len}` : `${bandOffset + len} 0`;
   const bandX2 = o.vertical ? 0 : bandWidth;
   const bandY2 = o.vertical ? bandWidth : 0;
-  const shimmerBand = o.animation === 'shimmer'
+  const bandStart = bandOffset - bandWidth;
+  const bandEnd = bandOffset + len;
+  const bandMotion = o.vertical
+    ? `<animate attributeName="y1" from="${bandStart}" to="${bandEnd}" dur="2.6s" begin="${motionBegin}" repeatCount="indefinite"/><animate attributeName="y2" from="${bandStart + bandWidth}" to="${bandEnd + bandWidth}" dur="2.6s" begin="${motionBegin}" repeatCount="indefinite"/>`
+    : `<animate attributeName="x1" from="${bandStart}" to="${bandEnd}" dur="2.6s" begin="${motionBegin}" repeatCount="indefinite"/><animate attributeName="x2" from="${bandStart + bandWidth}" to="${bandEnd + bandWidth}" dur="2.6s" begin="${motionBegin}" repeatCount="indefinite"/>`;
+  const shimmerBand = shimmerEnabled
     ? `<linearGradient id="shine" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="${bandX2}" y2="${bandY2}" spreadMethod="pad">`
       + `<stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="0.38" stop-color="#fff" stop-opacity="0"/><stop offset="0.5" stop-color="#fff" stop-opacity="0.85"/><stop offset="0.62" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>`
-      + `<animateTransform attributeName="gradientTransform" type="translate" from="${bandFrom}" to="${bandTo}" dur="2.6s" repeatCount="indefinite"/></linearGradient>` : '';
+      + `${bandMotion}</linearGradient>` : '';
 
   const ox = (i) => o.padding + glyphWidths.slice(0, i).reduce((sum, width) => sum + width, 0) + i * o.spacing;
   const defs = grids.map((g, i) => `<path id="g${i}" d="${runs(g, 0, face)}"/>`).join('');
@@ -236,7 +250,6 @@ function renderSvg(text, opts = {}) {
   const shine = light ? mix(o.colors[0], '#000000', 0.55) : '#fff';
   const shineOpacity = light ? Math.min(1, o.highlight * 1.6) : o.highlight;
 
-  const reveal = o.animation === 'reveal';
   const letters = grids.map((g, i) => {
     const sx = glyphScale(i);
     let shadow = '';
@@ -246,7 +259,7 @@ function renderSvg(text, opts = {}) {
     }
     const shadowLayer = `<g transform="translate(${ox(i)} ${glyphY}) scale(${sx.toFixed(4)} 1)">${shadow}</g>`;
     const facePath = `<path d="${runs(g, ox(i), face, sx, glyphY)}" fill="url(#f)"/>`;
-    const shimmerFace = o.animation === 'shimmer' ? `<path d="${runs(g, ox(i), face, sx, glyphY)}" fill="url(#shine)"/>` : '';
+    const shimmerFace = shimmerEnabled ? `<path d="${runs(g, ox(i), face, sx, glyphY)}" fill="url(#shine)"/>` : '';
     let details = '';
     if (light) details += `<path d="${runs(g, 0, face)}" fill="none" stroke="${mix(o.colors[0], '#000000', 0.5)}" stroke-width="0.5" stroke-opacity="0.35"/>`;
     if (o.highlight > 0) details += `<path d="${runs(g, 0, edge)}" fill="${shine}" fill-opacity="${shineOpacity}"/>`;
@@ -256,7 +269,7 @@ function renderSvg(text, opts = {}) {
     return `<g${revealBase}>${shadowLayer}${facePath}${detailLayer}${shimmerFace}${waveFx}${reveal ? revealFx(i) : ''}</g>`;
   }).join('');
 
-  const blink = o.animation === 'blink' ? '<animate attributeName="opacity" values="1;.35;1" dur="1.6s" repeatCount="indefinite"/>' : '';
+  const blink = hasAnimation('blink') ? '<animate attributeName="opacity" values="1;.35;1" dur="1.6s" repeatCount="indefinite"/>' : '';
   // transparent wins over bg -> no rect at all, so the SVG can sit on any page color
   const paintBg = !o.transparent && !!o.bg;
   const bg = paintBg ? `<rect width="${W}" height="${Htotal}" fill="${o.bg}"/>` : '';
@@ -266,7 +279,7 @@ function renderSvg(text, opts = {}) {
 
   // aria-label + responsive: width/height only hint the intrinsic size, CSS max-width keeps it fluid
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${Htotal}" width="${W * o.scale}" height="${Htotal * o.scale}" preserveAspectRatio="xMidYMid meet" shape-rendering="crispEdges" role="img" aria-label="${esc(String(text))}">`
-    + `<title>${esc(String(text))}</title><defs>${defs}${reveal ? blurFilter() : ''}<linearGradient id="f" gradientUnits="userSpaceOnUse" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" spreadMethod="reflect">${stops}${shimmer}</linearGradient>${shimmerBand}</defs>`
+    + `<title>${esc(String(text))}</title><defs>${defs}${reveal ? blurFilter() : ''}<linearGradient id="f" gradientUnits="userSpaceOnUse" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" spreadMethod="reflect">${stops}${gradientMotion}</linearGradient>${shimmerBand}</defs>`
     + `${bg}<g>${blink}${letters}</g>`
     + `${floorBand}${footer}</svg>`;
 }
@@ -288,7 +301,8 @@ function blurFilter() {
 // gradient-floor: a soft wavy light band sweeping along the floor under the text.
 function floorFx(o, W, floorH) {
   const rows = [];               // each row = one horizontal light band, dimmer toward the bottom
-  const top = 2 * (o.padding + (o.animation === 'wave' ? 1 : 0)) + 7 + o.depth + (o.weight > 1 ? 1 : 0);
+  const hasWave = (Array.isArray(o.animation) ? o.animation : String(o.animation || 'none').split('+')).includes('wave');
+  const top = 2 * (o.padding + (hasWave ? 1 : 0)) + 7 + o.depth + (o.weight > 1 ? 1 : 0);
   const c0 = o.colors[0], c1 = o.colors[o.colors.length - 1];
   for (let r = 0; r < floorH; r++) {
     const t = (r + 1) / floorH;  // 0 at the top band, 1 at the bottom
