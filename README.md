@@ -81,6 +81,10 @@ Run `pixel-banner --help` for the short version. The full reference is below; de
 | `--dark` | — | Turn light-page styling off, useful when overriding a `light-*` preset. |
 | `--animation NAME` | **`none`** | Choose `none`, `wave`, `shimmer`, `blink`, `floor`, or `reveal`. Combine effects with `+`, for example `reveal+shimmer`. |
 | `--footer` | off | Add a visible “powered by” credit and repository link below the banner. |
+| `--reveal-duration SEC` | **`0.7`** | Duration of each letter's reveal animation. |
+| `--reveal-stagger SEC` | **`0.18`** | Base time span between the first and last letter starts. |
+| `--reveal-bezier x1,y1,x2,y2` | **`0.22,1,0.36,1`** | Cubic Bézier easing for each letter's fade and rise. Values are between `0` and `1`. |
+| `--reveal-stagger-curve NAME` | **`linear`** | `linear` keeps equal gaps; `accelerate` shrinks gaps toward the end; `decelerate` grows them. |
 
 ### Terminal output
 
