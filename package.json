@@ -1,5 +1,5 @@
 {
-  "name": "pixel-banner",
+  "name": "@iamangusu/pixel-banner",
   "version": "1.0.0",
   "description": "Pixel-art text banners as SVG, with 3D shadow, gradients and animation (wave/shimmer/blink/floor/reveal). For GitHub READMEs and websites.",
   "type": "module",
@@ -7,6 +7,7 @@
   "exports": { ".": "./src/index.js" },
   "bin": { "pixel-banner": "src/cli.js" },
   "files": ["src", "docs", "assets"],
+  "publishConfig": { "access": "public" },
   "scripts": {
     "build": "node scripts/build-web.mjs && node scripts/gen-assets.mjs",
     "preview": "node scripts/build-web.mjs && node scripts/serve.mjs",

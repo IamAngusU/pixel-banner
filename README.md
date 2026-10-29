@@ -1,14 +1,18 @@
-<p align="center">
-  <img src="assets/pixel-banner-v2.svg" alt="Pixel Banner: animated pixel-art lettering" width="520">
-</p>
+<p align="center"><img src="assets/pixel-banner-v2.svg" width="520" alt="Pixel Banner"></p>
 
-<p align="center">Make bold pixel-art text as a small, editable SVG. Choose a preset, tune the colors, then drop it into a README or a website.</p>
+<h1 align="center">Make your README move.</h1>
+<p align="center">Create bold pixel-art text as editable SVGs, with custom gradients and animation.</p>
 
-<p align="center">
-  <a href="https://iamangusu.github.io/pixel-banner/"><img src="assets/generator-button-pb.svg" alt="Open the Pixel Banner generator" width="360"></a>
-</p>
+<p align="center"><a href="https://iamangusu.github.io/pixel-banner/"><img src="assets/generator-button-pb.svg" width="360" alt="Open the Pixel Banner generator"></a></p>
 
 <p align="center"><a href="README.de.md"><img src="docs/assets/readme-language-de.svg" height="40" alt="Diese README auf Deutsch lesen"></a></p>
+
+<p align="center">
+  <a href="https://www.npmjs.com/package/@iamangusu/pixel-banner"><img src="https://img.shields.io/npm/v/%40iamangusu%2Fpixel-banner?style=flat-square" alt="npm version"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/IamAngusU/pixel-banner?style=flat-square" alt="MIT license"></a>
+</p>
+
+<p align="center"><a href="#gallery">Gallery</a> · <a href="#quick-start">Quick start</a> · <a href="#terminal">Terminal</a> · <a href="#license">License</a></p>
 
 ## Gallery
 
@@ -22,45 +26,38 @@
 
 ## Quick start
 
-Open the [web generator](https://iamangusu.github.io/pixel-banner/) to make a banner without installing anything.
-
-Or generate one with Node.js 18+:
+Make an SVG with Node.js 18+—no global install needed:
 
 ```sh
-npx github:IamAngusU/pixel-banner "HELLO" \
-  --preset neon \
-  --animation reveal+shimmer \
-  --colors "#24D6C8,#39A7FF,#C879FF" \
-  --out hello.svg
+npx --yes @iamangusu/pixel-banner "HELLO" --preset neon --animation reveal+shimmer --colors "#24D6C8,#39A7FF,#C879FF" --out hello.svg
 ```
 
-Embed the SVG in your README:
+Use one or more comma-separated colors to choose the number of gradient stops. Then embed the SVG:
 
 ```md
 ![HELLO](hello.svg)
 ```
 
-Gradient stop count is up to you: pass one or more comma-separated colors with `--colors`.
-Every generated SVG also includes a hidden source comment linking back to this repository.
+Every generated SVG includes a hidden source comment linking to this repository.
 
 ## Terminal
 
-Print the repo banner directly in the terminal with its pixel font and neon colors (Node.js 18+):
+Print the pixel-art banner in color:
 
 ```sh
-npx --yes github:IamAngusU/pixel-banner "PIXEL-BANNER" --preset neon --ansi
+npx --yes @iamangusu/pixel-banner "PIXEL-BANNER" --preset neon --ansi
 ```
 
-Play its reveal and color shimmer in the terminal; stop with `Ctrl+C`:
+Play the reveal and color shimmer live:
 
 ```sh
-npx --yes github:IamAngusU/pixel-banner "PIXEL-BANNER" --preset neon --animation reveal+shimmer --tui
+npx --yes @iamangusu/pixel-banner "PIXEL-BANNER" --preset neon --animation reveal+shimmer --tui
 ```
 
-If you use it often, install it once and run `pixel-banner` directly:
+For frequent use, install it once:
 
 ```sh
-npm install --global https://codeload.github.com/IamAngusU/pixel-banner/tar.gz/refs/heads/main
+npm install --global @iamangusu/pixel-banner
 pixel-banner "PIXEL-BANNER" --preset neon --animation reveal+shimmer --tui
 ```
 
