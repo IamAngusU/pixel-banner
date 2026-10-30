@@ -157,7 +157,7 @@ test('reveal supports configurable duration, easing, and accelerating letter sta
     revealStaggerCurve: 'accelerate',
   });
   assert.match(svg, /values="0;1" calcMode="spline" keyTimes="0;1" keySplines="0.1 0.2 0.8 0.9" dur="0.4s"/);
-  const times = [...svg.matchAll(/attributeName="opacity" values="0;1"[^>]*begin="([\\d.]+)s"/g)].map((m) => Number(m[1]));
+  const times = [...svg.matchAll(/attributeName="opacity" values="0;1"[^>]*begin="([\d.]+)s"/g)].map((m) => Number(m[1]));
   assert.equal(times.length, 4);
   assert.equal(times[0], 0);
   assert.ok(times[2] - times[1] < times[1] - times[0] || times[1] === 0, 'later letters begin with progressively shorter gaps');
